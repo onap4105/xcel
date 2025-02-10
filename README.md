@@ -44,3 +44,97 @@
 - **Need advanced features without pay?** → OpenSearch.
 - **Rely on Elastic’s latest innovations?** → Elasticsearch OSS (with SSPL awareness).
 - **AWS environment?** → OpenSearch for seamless integration.
+Both **Fluent Bit** and **Fluentd** support logging to Elasticsearch OSS and OpenSearch OSS, but there are key differences in compatibility, configuration, and feature support due to the divergence between the two projects. Here’s a breakdown:
+
+---
+
+### **1. Elasticsearch OSS Support**
+#### **Fluentd**:
+- **Plugin**: Uses the [`out_elasticsearch`](https://github.com/uken/fluent-plugin-elasticsearch) plugin to ship logs to Elasticsearch.
+- **Compatibility**:
+  - Works with Elasticsearch OSS **7.x and older** (Apache 2.0 licensed versions).
+  - For **Elasticsearch 8.x**, compatibility depends on the plugin version. Newer Elasticsearch OSS versions (under SSPL) may require updates to the plugin or configuration tweaks (e.g., SSL/TLS settings, API compatibility headers).
+- **Authentication**:
+  - Supports basic auth, API keys, and TLS/SSL.
+  - Advanced security features (e.g., role-based access control) require Elasticsearch’s commercial license or OpenSearch’s open-source security.
+
+#### **Fluent Bit**:
+- **Output Plugin**: Uses the **Elasticsearch output plugin** (`es`).
+- **Compatibility**:
+  - Works with Elasticsearch OSS 7.x and 8.x, but newer Elasticsearch versions may require:
+    - Explicit `api_key` or `http_user`/`http_passwd` configuration.
+    - `tls` settings for HTTPS.
+    - `suppress_type_name on` (for Elasticsearch 8.x, which removes document types).
+- **Limitations**:
+  - Features like machine learning or advanced security require Elastic’s commercial stack (X-Pack).
+
+---
+
+### **2. OpenSearch OSS Support**
+#### **Fluentd**:
+- **Plugin**: Use the [`out_opensearch`](https://github.com/fluent/fluent-plugin-opensearch) plugin (a fork of `out_elasticsearch` tailored for OpenSearch).
+- **Compatibility**:
+  - Designed for OpenSearch 1.x/2.x (forked from Elasticsearch 7.10.2).
+  - Handles OpenSearch-specific API changes (e.g., security endpoints, index management).
+- **Authentication**:
+  - Supports Sigv4 signing for AWS OpenSearch Serverless/IAM roles.
+  - TLS/SSL and basic auth work out-of-the-box (OpenSearch’s security plugin is open-source).
+
+#### **Fluent Bit**:
+- **Native Support**: Added OpenSearch output in **v1.8.0** ([official docs](https://docs.fluentbit.io/manual/pipeline/outputs/opensearch)).
+- **Configuration**:
+  - Use the `opensearch` output plugin (not `es`).
+  - Example:
+    ```ini
+    [OUTPUT]
+        Name          opensearch
+        Match         *
+        Host          opensearch-host
+        Port          9200
+        Index         my_index
+        AWS_Region    us-west-2
+        AWS_Auth      On
+        tls           On
+    ```
+- **Features**:
+  - Supports Sigv4 authentication for AWS-managed OpenSearch clusters.
+  - TLS/SSL and OpenSearch’s native security (e.g., fine-grained access control).
+
+---
+
+### **3. Key Differences & Considerations**
+| Aspect                  | Elasticsearch OSS                         | OpenSearch OSS                             |
+|-------------------------|-------------------------------------------|--------------------------------------------|
+| **Fluentd Plugin**      | `out_elasticsearch`                       | `out_opensearch` (forked, optimized)       |
+| **Fluent Bit Plugin**   | `es` output plugin                        | `opensearch` output plugin (native)        |
+| **Security**            | Limited in OSS (needs commercial license) | Built-in open-source security (e.g., RBAC) |
+| **AWS Integration**     | Manual Sigv4 setup                        | Native Sigv4 support in plugins            |
+| **Version Compatibility** | Issues with Elasticsearch 8.x+          | Aligns with OpenSearch 1.x/2.x APIs        |
+
+---
+
+### **4. Common Issues & Fixes**
+- **Elasticsearch 8.x Compatibility**:
+  - Add `suppress_type_name on` in Fluent Bit/Fluentd to avoid type-related errors.
+  - Use `api_key` instead of basic auth if Elasticsearch 8.x is configured with API keys.
+- **OpenSearch TLS Errors**:
+  - Ensure the `tls` option is enabled and the CA certificate is correctly configured.
+- **AWS Sigv4 Authentication**:
+  - For AWS OpenSearch Serverless, use `AWS_Region`, `AWS_Auth`, and `AWS_Service os` (for Serverless) in Fluent Bit.
+
+---
+
+### **5. Which Should You Use?**
+- **Elasticsearch OSS**:
+  - If you’re tied to Elastic’s ecosystem or need the latest non-SSPL core features.
+  - Requires workarounds for newer versions (8.x).
+- **OpenSearch OSS**:
+  - Better for open-source compliance, AWS users, or needing built-in security/alerting.
+  - Smoother integration with Fluent Bit/Fluentd (dedicated plugins).
+
+---
+
+### **Summary**
+- **Fluent Bit**: Prefer the `opensearch` output plugin for OpenSearch and the `es` plugin for Elasticsearch OSS (with version tweaks).
+- **Fluentd**: Use `out_opensearch` for OpenSearch and `out_elasticsearch` for Elasticsearch OSS.
+- **OpenSearch** is more straightforward for AWS users and open-source purists, while **Elasticsearch OSS** requires caution with newer SSPL-licensed versions.
