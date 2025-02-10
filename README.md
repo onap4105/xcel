@@ -102,7 +102,7 @@ Both **Fluent Bit** and **Fluentd** support logging to Elasticsearch OSS and Ope
 
 ---
 
-### ** Key Differences & Considerations**
+### **Key Differences & Considerations**
 | Aspect                  | Elasticsearch OSS                         | OpenSearch OSS                             |
 |-------------------------|-------------------------------------------|--------------------------------------------|
 | **Fluentd Plugin**      | `out_elasticsearch`                       | `out_opensearch` (forked, optimized)       |
