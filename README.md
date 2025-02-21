@@ -136,14 +136,18 @@ Both **Fluent Bit** and **Fluentd** support logging to Elasticsearch OSS and Ope
 
 ### **Summary**
 
-### **3. Example Configurations**
+### **1. Suggested Prometheus Configurations**
 
 | **Setup**      | **Targets** | **CPU** | **Memory** | **Disk(PVC)**    |
 |----------------|-------------|---------|------------|------------------|
 | **Dev**        | 10–20       | 1 core  | 2 GB       | 20 GB            |
 | **Test/Prod**  | 100–200     | 2 cores | 4–8 GB     | 100–200 GB       |
 
+### **2. Suggested Configurations for grafana-sc-dashboard and grafana-sc-datasources**
 
+| **Container**      | **CPU** | **Memory** | **Disk(PVC)**    |
+|--------------------|---------|---------|------------|------------------|
+| **grafana**        | 1 core  | 2 GB       | 20 GB            |
 
 - **Fluent Bit**: Prefer the `opensearch` output plugin for OpenSearch and the `es` plugin for Elasticsearch OSS (with version tweaks).
 - **Fluentd**: Use `out_opensearch` for OpenSearch and `out_elasticsearch` for Elasticsearch OSS.
