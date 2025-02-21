@@ -135,6 +135,17 @@ Both **Fluent Bit** and **Fluentd** support logging to Elasticsearch OSS and Ope
 ---
 
 ### **Summary**
+
+### **3. Example Configurations**
+
+| **Setup** | **Targets** | **CPU** | **Memory** | **Disk**         | **Network**       |
+|-----------|-------------|---------|------------|------------------|-------------------|
+| **Dev**   | 10–20       | 1 core  | 2 GB       | 20 GB (SSD)      | Low               |
+| **Prod**  | 100–200     | 2 cores | 4–8 GB     | 100–200 GB (SSD) | Moderate          |
+| **Large** | 500+        | 4+ cores| 16+ GB     | 1 TB+ (SSD)      | High bandwidth    |
+
+
+
 - **Fluent Bit**: Prefer the `opensearch` output plugin for OpenSearch and the `es` plugin for Elasticsearch OSS (with version tweaks).
 - **Fluentd**: Use `out_opensearch` for OpenSearch and `out_elasticsearch` for Elasticsearch OSS.
 - **OpenSearch** is more straightforward for AWS users and open-source purists, while **Elasticsearch OSS** requires caution with newer SSPL-licensed versions.
