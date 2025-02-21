@@ -138,11 +138,10 @@ Both **Fluent Bit** and **Fluentd** support logging to Elasticsearch OSS and Ope
 
 ### **3. Example Configurations**
 
-| **Setup** | **Targets** | **CPU** | **Memory** | **Disk**         | **Network**       |
-|-----------|-------------|---------|------------|------------------|-------------------|
-| **Dev**   | 10–20       | 1 core  | 2 GB       | 20 GB (SSD)      | Low               |
-| **Prod**  | 100–200     | 2 cores | 4–8 GB     | 100–200 GB (SSD) | Moderate          |
-| **Large** | 500+        | 4+ cores| 16+ GB     | 1 TB+ (SSD)      | High bandwidth    |
+| **Setup**      | **Targets** | **CPU** | **Memory** | **Disk**         |
+|----------------|-------------|---------|------------|------------------|
+| **Dev**        | 10–20       | 1 core  | 2 GB       | 20 GB (SSD)      |
+| **Prod/Test**  | 100–200     | 2 cores | 4–8 GB     | 100–200 GB (SSD) |
 
 
 
