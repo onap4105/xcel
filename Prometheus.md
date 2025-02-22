@@ -3,9 +3,9 @@ Here's a summarized table for the resource configurations:
 | **Component**               | **CPU Requests** | **CPU Limits** | **Memory Requests** | **Memory Limits** | **Storage**               |
 |------------------------------|------------------|----------------|---------------------|-------------------|---------------------------|
 | **Prometheus**               |   2 cores        |   4 cores      |   8 GiB             |   16 GiB          | 100–200 GiB (Persistent)  |
-| **Grafana**                  | 0.5 cores        | 1–2 cores      | 512 MiB             | 2–4 GiB           | 10–20 GiB (or external DB)|
-| **Grafana-sc-datasource**    | 0.05–0.1 cores   | 0.1–0.2 cores  | 64–128 MiB          | 128–256 MiB       | N/A                       |
-| **Grafana-sc-dashboard**     | 0.05–0.1 cores   | 0.1–0.2 cores  | 64–128 MiB          | 128–256 MiB       | N/A                       |
+| **Grafana**                  |   1 cores        |   2 cores      |   2 GIB             |    4 GiB          | 10–20 GiB (or external DB)|
+| **Grafana-sc-datasource**    |   0.1 cores      |   0.2 cores    |   128 MiB           |   256 MiB         | N/A                       |
+| **Grafana-sc-dashboard**     |   0.1 cores      |   0.2 cores    |   128 MiB           |   256 MiB         | N/A                       |
 
 ---
 When determining resource requirements for a Prometheus container (exposing port `9090` for its web interface), consider the following guidelines, which depend on the scale of your monitoring setup:
