@@ -1,0 +1,7 @@
+# Check ClusterRoleBindings referencing the anonymous user or group
+kubectl get clusterrolebindings -o json | \
+  jq '.items[] | select(.subjects[]?.name == "system:anonymous" or .subjects[]?.name == "system:unauthenticated") | .metadata.name'
+
+# Check RoleBindings in all namespaces
+kubectl get rolebindings --all-namespaces -o json | \
+  jq '.items[] | select(.subjects[]?.name == "system:anonymous" or .subjects[]?.name == "system:unauthenticated") | .metadata.name + " in namespace " + .metadata.namespace'
