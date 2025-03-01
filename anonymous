@@ -5,3 +5,25 @@ kubectl get clusterrolebindings -o json | \
 # Check RoleBindings in all namespaces
 kubectl get rolebindings --all-namespaces -o json | \
   jq '.items[] | select(.subjects[]?.name == "system:anonymous" or .subjects[]?.name == "system:unauthenticated") | .metadata.name + " in namespace " + .metadata.namespace'
+
+# clusterrole-readonly.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: anonymous-readonly
+rules:
+- apiGroups: [""]
+  resources: ["healthz", "version", "metrics"]
+  verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: anonymous-readonly
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: anonymous-readonly
+subjects:
+- kind: User
+  name: system:anonymous
