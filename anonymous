@@ -27,3 +27,34 @@ roleRef:
 subjects:
 - kind: User
   name: system:anonymous
+
+
+CERT_FILE="/etc/kubernetes/pki/admin.crt"
+KEY_FILE="/etc/kubernetes/pki/admin.key"
+CA_FILE="/etc/kubernetes/pki/ca.crt"
+
+curl --cacert $CA_FILE \
+     --cert $CERT_FILE \
+     --key $KEY_FILE \
+     https://localhost:6443/livez
+
+
+openssl verify -CAfile $CA_FILE $CERT_FILE
+
+openssl x509 -in $CERT_FILE -noout -dates
+
+openssl genrsa -out user.key 2048
+openssl req -new -key user.key -out user.csr -subj "/CN=test-user/O=my-group"
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: test-user-livez-access
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:kubelet-api-reader  # Predefined role for health checks
+subjects:
+- kind: User
+  name: test-user  # Must match the certificate's CN
+  apiGroup: rbac.authorization.k8s.io
