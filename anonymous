@@ -58,3 +58,17 @@ subjects:
 - kind: User
   name: test-user  # Must match the certificate's CN
   apiGroup: rbac.authorization.k8s.io
+
+
+# Generate new admin cert/key (adjust SUBJECT and DAYS as needed)
+sudo openssl req -new -newkey rsa:2048 -nodes -keyout admin.key -out admin.csr \
+  -subj "/CN=admin/O=system:masters"
+sudo openssl x509 -req -in admin.csr -CA /etc/kubernetes/pki/ca.crt \
+  -CAkey /etc/kubernetes/pki/ca.key -CAcreateserial -out admin.crt -days 365
+
+# Update kubeconfig to use the new certs
+kubectl config set-credentials admin \
+  --client-certificate=admin.crt \
+  --client-key=admin.key \
+  --embed-certs=true
+
