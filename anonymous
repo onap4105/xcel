@@ -72,3 +72,7 @@ kubectl config set-credentials admin \
   --client-key=admin.key \
   --embed-certs=true
 
+# Use the kubelet's credentials to query the API server
+curl -k --cert /var/lib/kubelet/pki/kubelet-client-current.pem --key /var/lib/kubelet/pki/kubelet-client-current.pem https://<API_SERVER>:6443/healthz
+
+
