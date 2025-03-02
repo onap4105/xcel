@@ -140,3 +140,113 @@ A **403 Forbidden** error indicates the kubelet’s credentials are authenticate
 4. Valid startup probe paths (`/livez` or `/readyz`).
 
 Sent from Yahoo Mail for iPhone
+
+A `401 Unauthorized` error during the **`kube-apiserver` self `livez` check** typically indicates an authentication failure when the API server attempts to verify its own health. This is unusual because the `livez`/`readyz` endpoints are designed to bypass authentication/authorization by default. Below are the most likely causes and solutions:
+
+---
+
+### **1. Misconfigured `--anonymous-auth` Flag**
+- **Problem:** If the `kube-apiserver` is started with `--anonymous-auth=false`, it disables anonymous access to the API server. This blocks unauthenticated requests to the `/livez` endpoint, causing a `401` error.
+- **Fix:**  
+  Ensure the `--anonymous-auth` flag is set to `true` (the default). Check the API server manifest (e.g., `/etc/kubernetes/manifests/kube-apiserver.yaml`):
+  ```yaml
+  - command:
+    - kube-apiserver
+    - --anonymous-auth=true  # Ensure this is present and set to "true"
+  ```
+
+---
+
+### **2. Admission Controller Interference**
+- **Problem:** Aggressive admission controllers (e.g., `NodeRestriction`, custom webhooks) might block anonymous requests to the health endpoints.
+- **Fix:**  
+  - Verify if an admission controller is denying access to the `/livez` endpoint. Check API server logs for clues:
+    ```bash
+    kubectl logs -n kube-system kube-apiserver-<node-name> | grep -i "unauthorized"
+    ```
+  - Whitelist the `/livez`, `/readyz`, and `/healthz` endpoints in admission control configurations if necessary.
+
+---
+
+### **3. RBAC Misconfiguration**
+- **Problem:** The `system:anonymous` user or `system:unauthenticated` group might lack permissions to access the health endpoints due to overly restrictive RBAC policies.
+- **Fix:**  
+  Ensure the following RBAC rules exist to allow unauthenticated access to health checks:
+  ```yaml
+  apiVersion: rbac.authorization.k8s.io/v1
+  kind: ClusterRole
+  metadata:
+    name: healthz-access
+  rules:
+  - nonResourceURLs: ["/livez", "/readyz", "/healthz"]
+    verbs: ["get"]
+  ---
+  apiVersion: rbac.authorization.k8s.io/v1
+  kind: ClusterRoleBinding
+  metadata:
+    name: healthz-access
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: healthz-access
+  subjects:
+  - kind: Group
+    name: system:unauthenticated
+    apiGroup: rbac.authorization.k8s.io
+  ```
+
+---
+
+### **4. Network Policy or Firewall Blocking Loopback Requests**
+- **Problem:** Network policies or host firewalls might block the API server’s internal loopback requests to itself (e.g., when running self-health checks).
+- **Fix:**  
+  - Allow traffic to `localhost`/`127.0.0.1` on the API server port (default: `6443`).
+  - Check network policies affecting the control plane nodes.
+
+---
+
+### **5. Corrupted or Missing Service Account Tokens**
+- **Problem:** If the API server relies on a service account token for internal communication (rare), a missing or invalid token could cause `401` errors.
+- **Fix:**  
+  - Verify the service account token mount in the API server pod:
+    ```yaml
+    spec:
+      containers:
+      - name: kube-apiserver
+        volumeMounts:
+        - name: kube-api-access-xxxxx
+          mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+    ```
+  - Ensure the token exists and is valid.
+
+---
+
+### **6. Reverse Proxy or Load Balancer Interference**
+- **Problem:** A proxy/load balancer (e.g., NGINX, HAProxy) in front of the API server might require authentication, even for health checks.
+- **Fix:**  
+  Configure the proxy to exclude `/livez`, `/readyz`, and `/healthz` from authentication.
+
+---
+
+### **Troubleshooting Steps**
+1. **Test the endpoint manually** (from the API server node):
+   ```bash
+   curl -k https://localhost:6443/livez
+   ```
+   If it returns `401`, the issue is local to the API server configuration.  
+   If it succeeds, the problem lies in external probes (e.g., kubelet, monitoring tools).
+
+2. **Check API server logs** for authentication failures:
+   ```bash
+   journalctl -u kube-apiserver | grep -i "unauthorized"
+   ```
+
+3. **Verify API server flags**:
+   ```bash
+   ps aux | grep kube-apiserver | grep -E 'anonymous-auth|enable-admission-plugins'
+   ```
+
+---
+
+### **Summary**
+The `401` error on the `livez` check is almost always caused by **disabled anonymous authentication** or **overly restrictive RBAC policies**. Start by ensuring `--anonymous-auth=true` and that RBAC allows access to the health endpoints. If the issue persists, audit admission controllers and network policies.
