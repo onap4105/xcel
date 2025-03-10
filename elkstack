@@ -1,0 +1,2 @@
+kubectl get pods -n <namespace> -o json | jq '.items[] | {podName: .metadata.name, containers: .spec.containers[] | {name: .name, resources: .resources}}'
+kubectl get pod <pod-name> -n <namespace> -o json | jq '.spec.containers[] | {name: .name, resources: .resources}'
