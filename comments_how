@@ -1,0 +1,58 @@
+onap4105: how do i use vscode to add a comment line at the begining of each files in kubespray project, there are many type of file extensions
+
+Workspace: Collecting workspace informationTo add a comment line at the beginning of each file in the Kubespray project using Visual Studio Code, you can use the "Find and Replace" feature with regular expressions. Here are the steps:
+
+1. Open Visual Studio Code.
+2. Press `Ctrl+Shift+H` to open the "Replace in Files" panel.
+3. Enable "Use Regular Expression" by clicking the `.*` button.
+4. In the "Find" field, enter the following regular expression to match the beginning of each file:
+   ```
+   ^(.*)
+   ```
+5. In the "Replace" field, enter the comment line you want to add. For example, to add a comment line `# Comment` for shell scripts and `// Comment` for other files, you can use:
+   ```
+   # Comment\n$1
+   ```
+   or
+   ```
+   // Comment\n$1
+   ```
+6. Click the "Replace All" button to apply the changes to all files.
+
+Note: This method will add the same comment line to all files regardless of their extension. If you need to add different comment lines based on file extensions, you will need to run the "Find and Replace" operation separately for each file type.
+
+For example, to add `# Comment` to `.sh` files and `// Comment` to `.js` files:
+
+1. For `.sh` files:
+   - In the "Find" field, enter:
+     ```
+     ^(.*)
+     ```
+   - In the "Replace" field, enter:
+     ```
+     # Comment\n$1
+     ```
+   - In the "files to include" field, enter:
+     ```
+     **/*.sh
+     ```
+   - Click "Replace All".
+
+2. For `.js` files:
+   - In the "Find" field, enter:
+     ```
+     ^(.*)
+     ```
+   - In the "Replace" field, enter:
+     ```
+     // Comment\n$1
+     ```
+   - In the "files to include" field, enter:
+     ```
+     **/*.js
+     ```
+   - Click "Replace All".
+
+Repeat these steps for other file types as needed.   - Click "Replace All".
+
+Repeat these steps for other file types as needed.
