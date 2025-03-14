@@ -1,3 +1,106 @@
+Here’s a concise summary of the issue when mapping fields like kubernetes.label.app=kibana and kubernetes.label.app.kubernetes.io/name=fluentbit:
+
+Core Issue
+Elasticsearch’s default behavior interprets dots (.) in field names as nested objects. For example:
+
+kubernetes.label.app=kibana is mapped as a field: kubernetes → label → app.
+
+kubernetes.label.app.kubernetes.io/name=fluentbit is split into a nested hierarchy: kubernetes → label → app → kubernetes → io → name.
+
+This creates a conflict because:
+
+The first field (app) is treated as a value field (e.g., keyword or text).
+
+The second field (app.kubernetes.io/name) is treated as a nested object under app.
+
+Elasticsearch cannot merge a field (app) and a nested object (app.kubernetes.io/name) in the same mapping path.
+
+Consequences
+Mapping Errors: Elasticsearch throws a mapper_parsing_exception because it cannot dynamically create a nested object (app.kubernetes.io) when app already exists as a simple field.
+
+Data Loss: One or both fields will fail to index, making them unavailable in Kibana.
+
+Solutions
+To preserve both fields as flat key-value pairs (e.g., app=kibana and app.kubernetes.io/name=fluentbit under kubernetes.label):
+
+1. Use flattened for kubernetes.label
+json
+Copy
+PUT /your-index
+{
+  "mappings": {
+    "properties": {
+      "kubernetes.label": {
+        "type": "flattened"
+      }
+    }
+  }
+}
+Result: All subfields (including app and app.kubernetes.io/name) are stored as keywords.
+
+2. Dynamic Template to Force keyword Mapping
+json
+Copy
+PUT /your-index
+{
+  "mappings": {
+    "dynamic_templates": [{
+      "kubernetes_labels": {
+        "path_match": "kubernetes.label.*",
+        "mapping": { "type": "keyword" }
+      }
+    }]
+  }
+}
+Result: Dotted fields like app.kubernetes.io/name are treated as single keywords (no splitting).
+
+Why This Works
+Both solutions prevent Elasticsearch from splitting dotted field names into nested objects. This ensures kubernetes.label.app and kubernetes.label.app.kubernetes.io/name are indexed as separate, flat fields, resolving the mapping conflict.
+
+After applying the fix, refresh the Kibana index pattern to access the fields.
+
+New chat
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Summary of the Issue
 When mapping fields like kubernetes.label.app and kubernetes.label.app.kubernetes.io/instance in Elasticsearch/Kibana:
 
