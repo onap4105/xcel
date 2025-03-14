@@ -1,0 +1,53 @@
+Summary of the Issue
+When mapping fields like kubernetes.label.app and kubernetes.label.app.kubernetes.io/instance in Elasticsearch/Kibana:
+
+Core Problem
+Elasticsearch treats dots (.) in field names as nested object separators by default.
+
+Example: kubernetes.label.app.kubernetes.io/instance is split into a hierarchy:
+kubernetes → label → app → kubernetes → io → instance (which doesn’t exist in your data).
+
+Similarly, kubernetes.label.app is split into kubernetes → label → app.
+
+This results in invalid mappings because the actual data has flat fields with dots in their names, not nested objects.
+
+Consequences
+Broken Fields:
+
+The fields kubernetes.label.app and kubernetes.label.app.kubernetes.io/instance are not indexed as single fields.
+
+They become inaccessible for searches, filters, or visualizations in Kibana.
+
+Conflicting Mappings:
+
+If kubernetes.label.app is dynamically mapped as an object, attempting to index kubernetes.label.app.kubernetes.io/instance later will fail, as Elasticsearch cannot merge a "nested object" with a "keyword" field.
+
+Solution Overview
+To preserve dotted fields as single, searchable fields (e.g., app and app.kubernetes.io/instance under kubernetes.label):
+
+Use the flattened Data Type
+
+Maps the entire kubernetes.label object as a single field, treating subfields like app and app.kubernetes.io/instance as keywords.
+
+Pros: Simple, no nested splitting.
+
+Cons: All subfields are keyword (no text analysis).
+
+Dynamic Templates
+
+Explicitly map all fields under kubernetes.label.* as keyword to prevent splitting:
+
+json
+Copy
+"dynamic_templates": [{
+  "labels": {
+    "path_match": "kubernetes.label.*",
+    "mapping": { "type": "keyword", "ignore_above": 256 }
+  }
+}]
+Pros: Granular control over specific subfields.
+
+Key Takeaway
+Without explicit mapping, Elasticsearch misinterprets dots in field names as nested objects, breaking Kibana functionality. Use flattened or dynamic templates to ensure dotted fields (like app and app.kubernetes.io/instance) are stored as flat keywords. Refresh Kibana’s index pattern after updating mappings.
+
+New chat
