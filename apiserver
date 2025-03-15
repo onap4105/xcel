@@ -30,6 +30,7 @@ To resolve a **kube-apiserver startup probe failure with a 403 Forbidden error**
 
 ---
 
+
 ### 3. **Verify RBAC Permissions**
    - The kubelet uses the `system:node` or `system:kubelet` identity to contact the API server. Ensure it has access to the probe endpoints:
      ```bash
