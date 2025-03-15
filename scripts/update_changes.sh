@@ -36,65 +36,90 @@
 # # legacy_variable: old_value
 # new_variable: value
 ##############################################
-FILE1="file1.yml"
-FILE2="file2.yml"
-TEMP_FILE="temp.yml"
 
-# Case 3: Insert TLS cipher block (preserve indentation)
-# Extract cipher block from FILE1
+ FILE1="file1.yml"
+FILE2="file2.yml"
+TEMP_FILE="$(mktemp)"
+BACKUP_FILE="$FILE2.bak"
+
+# Create backup
+cp "$FILE2" "$BACKUP_FILE"
+
+# Extract cipher block with strict 2-space indentation
 CIPHER_BLOCK=$(awk '
-    /^tls_cipher_suites:/ { block=1; print; next }
-    block && /^  -/      { print; next }
-    block                { block=0; exit }
+    /^tls_cipher_suites:/ {
+        print $0
+        while ((getline line) > 0) {
+            if (line ~ /^  - /) {  # Must have exactly 2 spaces
+                print line
+            } else {
+                break
+            }
+        }
+    }
 ' "$FILE1")
 
-# Process variables and update FILE2
+# Process file2 with atomic replacement
 awk -v cipher_block="$CIPHER_BLOCK" '
-    BEGIN { in_block = 0; inserted = 0 }
-    
-    # Insert cipher block at placeholder
-    /# INSERT_TLS_CIPHER_SUITES/ {
-        print cipher_block
-        inserted = 1
+    BEGIN { cipher_inserted = 0 }
+
+    # Replace existing cipher block or placeholder
+    /^(# INSERT_TLS_CIPHER_SUITES|tls_cipher_suites:)/ {
+        if (!cipher_inserted) {
+            print cipher_block
+            cipher_inserted = 1
+        }
+        # Skip existing list items
+        while ((getline line) > 0) {
+            if (line ~ /^  - /) continue
+            print line
+            break
+        }
         next
     }
-    
-    # Handle existing variables (Case 1)
-    FNR==NR {
-        if ($0 ~ /^[[:space:]]*#/ || $0 ~ /^$/) next
-        if ($0 ~ /^tls_cipher_suites:/) next
-        key = $0
-        sub(/:.*/, "", key)
-        gsub(/[[:space:]]/, "", key)
+
+    # Process variables from FILE1
+    FILENAME == ARGV[1] && /^[^#]/ && !/tls_cipher_suites/ {
+        key = $0; sub(/:.*/, "", key); gsub(/ /, "", key)
         vars[key] = $0
         next
     }
-    
-    # Process FILE2 lines
-    {
-        if ($0 ~ /^[[:space:]]*#?[[:space:]]*[^:]+:/) {
-            key = $0
-            sub(/:.*/, "", key)
-            gsub(/[[:space:]#]/, "", key)
-            
-            if (key in vars) {
-                print vars[key]
-                delete vars[key]
-                in_block = 0
-                next
+
+    # Update existing variables
+    FILENAME == ARGV[2] {
+        if (match($0, /^[[:space:]]*#?[[:space:]]*([^:]+):/, groups)) {
+            current_key = groups[1]
+            if (current_key in vars) {
+                print vars[current_key]
+                delete vars[current_key]
+                  next
             }
         }
         print
     }
-    
-    # Add remaining variables at end (Case 2)
+
+    # Add remaining elements
     END {
-        if (!inserted) print cipher_block
+        if (!cipher_inserted) print cipher_block
         for (key in vars) print vars[key]
     }
 ' "$FILE1" "$FILE2" > "$TEMP_FILE"
 
-# Replace original file
-mv "$TEMP_FILE" "$FILE2"
+# Final indentation enforcement
+sed -i '
+    s/^\( *\)-/\1  -/  # Force 2-space indent before hyphen
+    s/   /  /g          # Replace triple spaces with double
+    /^$/d               # Remove empty lines
+' "$TEMP_FILE"
 
-echo "File update complete. Backup saved as $FILE2.bak"
+# Validate YAML
+cp "$TEMP_FILE" "./updated.yml"
+if yq eval '.' "./updated.yml" >/dev/null 2>&1; then
+    mv "./updated.yml" "$FILE2"
+    echo "Update successful! Backup: $BACKUP_FILE"
+else
+    echo "YAML Error. Inspect failed_update.yml"
+    cp "$TEMP_FILE" "failed_update.yml"
+    mv "$BACKUP_FILE" "$FILE2"
+    exit 1
+fi  
