@@ -52,4 +52,16 @@ awk '
             }
         }
     }
-' "$file1" "$file2" > "$file2.tmp" && mv "$file2.tmp" "$file2"
+' "$file1" "$file2" > "$file2.tmp" 
+
+# && mv "$file2.tmp" "$file2"
+# Validate YAML
+cp "$file2" "./$file2.bak"
+if yq eval '.' "$file2.tmp" >/dev/null 2>&1; then
+    mv "$file2.tmp" "$file2"
+    echo "Update successful!"
+else
+    echo "YAML Error. Inspect $file2.tmp"
+    cp "$file2.tmp" "failed_update.yml"
+    exit 1
+fi
