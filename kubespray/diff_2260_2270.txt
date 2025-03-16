@@ -96,6 +96,70 @@ hguan@DESKTOP-OVM19G5:~/kubespray$ ./chk_ver_diff.sh kubespray-2.26.0/contrib/of
   [identical]
   https://github.com/mikefarah/yq/releases/download/v4.42.1/yq_linux_amd64
 
+==============================================================
+│ ghcr.io/k8snetworkplumbingwg/multus-cni:v3.8
+│ ghcr.io/k8snetworkplumbingwg/multus-cni:v4.1.0
+
+│ quay.io/calico/apiserver:v3.28.1
+│ quay.io/calico/apiserver:v3.29.1
+
+│ quay.io/calico/cni:v3.28.1
+│ quay.io/calico/cni:v3.29.1
+
+│ quay.io/calico/kube-controllers:v3.28.1
+│ quay.io/calico/kube-controllers:v3.29.1
+
+│ quay.io/calico/node:v3.28.1
+│ quay.io/calico/node:v3.29.1
+
+│ quay.io/calico/pod2daemon-flexvol:v3.28.1
+
+│ quay.io/calico/typha:v3.28.1
+│ quay.io/calico/typha:v3.29.1
+
+│ quay.io/cilium/cilium:v1.15.4
+│ quay.io/cilium/cilium:v1.15.9
+
+│ quay.io/cilium/hubble-relay:v1.15.4
+│ quay.io/cilium/hubble-relay:v1.15.9
+
+│ quay.io/cilium/operator:v1.15.4
+│ quay.io/cilium/operator:v1.15.9
+
+│ quay.io/coreos/etcd:v3.5.12
+│ quay.io/coreos/etcd:v3.5.16
+
+│ quay.io/jetstack/cert-manager-cainjector:v1.14.7
+│ quay.io/jetstack/cert-manager-cainjector:v1.15.3
+
+│ quay.io/jetstack/cert-manager-controller:v1.14.7
+│ quay.io/jetstack/cert-manager-controller:v1.15.3
+
+│ quay.io/jetstack/cert-manager-webhook:v1.14.7
+│ quay.io/jetstack/cert-manager-webhook:v1.15.3
+
+│ registry.k8s.io/coredns/coredns:v1.11.1
+│ registry.k8s.io/coredns/coredns:v1.11.3
+
+│ registry.k8s.io/ingress-nginx/controller:v1.11.2
+│ registry.k8s.io/ingress-nginx/controller:v1.12.0
+
+│ registry.k8s.io/kube-apiserver:v1.30.4
+│ registry.k8s.io/kube-apiserver:v1.31.4
+
+│ registry.k8s.io/kube-controller-manager:v1.30.4
+│ registry.k8s.io/kube-controller-manager:v1.31.4
+
+│ registry.k8s.io/kube-proxy:v1.30.4
+│ registry.k8s.io/kube-proxy:v1.31.4
+
+│ registry.k8s.io/kube-scheduler:v1.30.4
+│ registry.k8s.io/kube-scheduler:v1.31.4
+
+│ registry.k8s.io/pause:3.10
+│ registry.k8s.io/pause:3.9
+
+=========================================================================
 
 
 (offline-venv) hguan@DESKTOP-OVM19G5:~/kubespray$ ./chk_ver_chg.sh kubespray-2.26.0/contrib/offline/temp/images.list kubespray-2.27.0/contrib/offline/temp/images.list
