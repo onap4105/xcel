@@ -1,0 +1,105 @@
+#!/bin/bash
+
+# Configuration
+ROOT_DIR=$1       # Directory to process
+HEADER_TEXT="# ---------------------------------------------------------------------------- #
+# Copyright (c) 2025 AT&T Inc. All Rights Reserved.                            #
+# ---------------------------------------------------------------------------- #"
+
+HEADER_TEXT1="// ----------------------------------------------------------------------------
+// Copyright (c) 2025 AT&T Inc. All Rights Reserved.
+// ---------------------------------------------------------------------------- "
+
+DRY_RUN="dryrun"           # Set to false to actually write changes
+EXCLUDE_DIRS="emptystate|build|Example|example"  # Directories to exclude
+
+# Check for command-line argument and set DRY_RUN if provided
+if [ -n "$2" ]; then
+    DRY_RUN="$2"
+fi
+
+# Function to display the help message
+usage() {
+    echo "Usage: $0 [DIRECTORY] [RUN_MODE]"
+    echo ""
+    echo "Arguments:"
+    echo "  DIRECTORY  The directory to operate on."
+    echo "  RUN_MODE   The mode of operation. Can be 'dryrun' or 'update'."
+    echo ""
+    echo "Example:"
+    echo "  $0 /path/to/directory dryrun"
+    echo "  $0 /path/to/directory update"
+}
+
+# Function to get appropriate comment format
+get_comment_format() {
+    case "$1" in
+        py|tf|sh|tpl) echo "$HEADER_TEXT" ;;
+        java)         echo "$HEADER_TEXT1" ;;
+        *)            echo "" ;;  # Unknown format
+    esac
+}
+
+# Check if the user requested help
+if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+    usage
+    exit 0
+fi
+
+# Construct the exclude argument for the find command
+exclude=""
+for dir in $(echo $EXCLUDE_DIRS | tr "|" "\n"); do
+    exclude="$exclude -o -path '*/$dir/*'"
+done
+
+# Construct the find command with exclusions
+find_cmd="find \"$ROOT_DIR\" -type f \
+    -not \( -path '*/.git/*' -o -path '*/venv/*' -o -path '*/node_modules/*' $exclude \) \
+    -print0"
+
+# Main processing
+eval "$find_cmd" | while IFS= read -r -d $'\0' file; do
+
+    # Get file extension
+    ext="${file##*.}"
+
+    # Get appropriate comment format
+    comment=$(get_comment_format "$ext")
+    [ -z "$comment" ] && continue  # Skip unknown formats
+
+    # Check if text file
+    file -b --mime-type "$file" | grep -q 'text/' || continue
+
+    # Check if header already exists
+    if grep -qF "$comment" "$file"; then
+        echo "✓ Header exists: $file"
+        continue
+    fi
+
+    # Add header (with dry-run support)
+    echo "→ ${DRY_RUN} Adding Copyright: $file"
+    if [ "$DRY_RUN" = "update" ]; then
+        temp_file=$(mktemp)
+        # Check if the first line is '#!/bin/bash'
+        if head -n 1 "$file" | grep -qE "^#! ?/bin/bash"; then
+            # Add the '#!/bin/bash' line and the comment, then the rest of the file
+            {
+                head -n 1 "$file"
+                echo ""
+                echo "$comment"
+                echo ""
+                tail -n +2 "$file"
+            } > "$temp_file"
+        else
+            # Add the comment at the top if '#!/bin/bash' is not present
+            {
+                echo "$comment"
+                echo ""
+                cat "$file"
+            } > "$temp_file"
+        fi
+        mv "$temp_file" "$file"
+    fi
+done
+
+echo "Process complete!"
