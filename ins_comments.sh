@@ -103,3 +103,23 @@ eval "$find_cmd" | while IFS= read -r -d $'\0' file; do
 done
 
 echo "Process complete!"
+
+comments from Tony
+the notion of get_comment_format() and #! processing should be separated out as two parts:
+ 
+check for existing copyright (no need to do anything further)
+determine the language:
+look first for a #! line and grab the language from there
+if not, THEN look at the extension and grab the language from there
+if there is a configurations for the extensions, use that
+otherwise use the list of "known" extensions
+otherwise the language is "unknown"
+keep a separate log of these so that the user can easily grab the list of files that need further viewing
+Once the language is decided, determine the comment convention for use with that language
+if the language is unknown, then use a default comment convention
+I suggest using a default of # instead of an empty string
+at some point, you will probably running to a language that requires both a comment prefix and suffix
+check for #! (any #!, not just /bin/bash lines)
+if it exists, preserve the #! line
+add the appropriate copyright line with the language-appropriate comment prefix/suffix
+ 
