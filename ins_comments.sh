@@ -122,4 +122,43 @@ at some point, you will probably running to a language that requires both a comm
 check for #! (any #!, not just /bin/bash lines)
 if it exists, preserve the #! line
 add the appropriate copyright line with the language-appropriate comment prefix/suffix
+
+your mv command does not preserve file permissions
+ 
+you could use a yaml configuration file like this:
+ 
+ 
+# language to comment convention. Use [str1,str2] for prefix and suffix
+comments:
+    python: '# '
+    c: '// '
+    c++: '// '
+    shell: '# '
+    terraform: '# '
+    template: '# '
+    perl: '# '
+# filename extensions to look for
+extensions:
+    py: python
+    sh: shell
+    bash: shell
+    ksh: shell
+    eksh: shell
+    tf: terraform
+    tpl: template
+    tmpl: template
+    template: template
+# #! mappings. Strings found in #! headers
+shbang:
+    python: python
+    perl: perl
+    bash: shell
+    sh: shell
+    ksh: shell
+    eksh: shell
+    dash: shell
+ 
+ 
+ 
+you COULD rewrite it into python -- might make a bunch of the processing easier, especially after adding support for a configuration file
  
