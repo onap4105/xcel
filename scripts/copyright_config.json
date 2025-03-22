@@ -1,0 +1,89 @@
+{
+    "__comment": "CONFIGURATION FILE FOR COPYRIGHT HEADER SCRIPT",
+    "__comment_1": "-----------------------------------------------------------",
+    "__comment_2": "Comment style definitions for different languages",
+    "__comment_3": "Format: {language: {prefix: '...', suffix: '...'}}",
+    "__comment_4": "Example: Python uses '# ' prefix, Java uses '//' prefix",
+    "headers": {
+        "python": {
+            "prefix": "# ",
+            "suffix": ""
+        },
+        "c": {
+            "prefix": "// ",
+            "suffix": ""
+        },
+        "c++": {
+            "prefix": "// ",
+            "suffix": ""
+        },
+        "shell": {
+            "prefix": "# ",
+            "suffix": ""
+        },
+        "terraform": {
+            "prefix": "# ",
+            "suffix": ""
+        },
+        "template": {
+            "prefix": "# ",
+            "suffix": ""
+        },
+        "perl": {
+            "prefix": "# ",
+            "suffix": ""
+        },
+        "java": {
+            "prefix": "//",
+            "suffix": ""
+        }
+    },
+
+    "__comment_5": "-----------------------------------------------------------",
+    "__comment_6": "File extension to language mappings",
+    "__comment_7": "Format: {extension: language} (extension should be lowercase)",
+    "__comment_8": "These take precedence over shebang detection",
+    "extensions": {
+        "py": "python",
+        "sh": "shell",
+        "bash": "shell",
+        "ksh": "shell",
+        "eksh": "shell",
+        "tf": "terraform",
+        "tpl": "template",
+        "tmpl": "template",
+        "template": "template",
+        "java": "java"
+    },
+
+    "__comment_9": "-----------------------------------------------------------",
+    "__comment_10": "Shebang (#!) pattern detection for script identification",
+    "__comment_11": "Format: {language: pattern} (matches the shebang interpreter)",
+    "__comment_12": "Example: 'python' matches '#!/usr/bin/python'",
+    "shbang_patterns": {
+        "python": "python",
+        "perl": "perl",
+        "bash": "bash",
+        "sh": "sh",
+        "ksh": "ksh",
+        "eksh": "eksh",
+        "dash": "dash"
+    },
+
+    "__comment_13": "-----------------------------------------------------------",
+    "__comment_14": "Directories to exclude from processing",
+    "__comment_15": "Note: These are case-sensitive",
+    "exclude_dirs": [
+        "emptystate",
+        "build",
+        "Example",
+        "example",
+        ".git",
+        "venv",
+        "node_modules"
+    ],
+
+    "__comment_16": "-----------------------------------------------------------",
+    "__comment_17": "Core copyright text to insert",
+    "__comment_18": "This will be wrapped in the comment style for each language",
+    "copyright_text": "Copyright (c) 2025 AT&T Inc. All Rights Reserved."
