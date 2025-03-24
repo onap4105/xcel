@@ -1,0 +1,62 @@
+# Copyright header configuration
+headers:
+  python:
+    prefix: "# "
+    suffix: ""
+  c:
+    prefix: "// "
+    suffix: ""
+  c++:
+    prefix: "// "
+    suffix: ""
+  shell:
+    prefix: "# "
+    suffix: ""
+  terraform:
+    prefix: "# "
+    suffix: ""
+  template:
+    prefix: "# "
+    suffix: ""
+  perl:
+    prefix: "# "
+    suffix: ""
+  java:
+    prefix: "//"
+    suffix: ""
+
+# File extension to language mappings
+extensions:
+  py: python
+  sh: shell
+  bash: shell
+  ksh: shell
+  eksh: shell
+  tf: terraform
+  tpl: template
+  tmpl: template
+  template: template
+  java: java
+
+# Shebang pattern detection
+shbang_patterns:
+  python: python
+  perl: perl
+  bash: bash
+  sh: sh
+  ksh: ksh
+  eksh: eksh
+  dash: dash
+
+# Directories to exclude from processing
+exclude_dirs:
+  - emptystate
+  - build
+  - Example
+  - example
+  - .git
+  - venv
+  - node_modules
+
+# Copyright text template
+copyright_text: "Copyright (c) 2025 AT&T Inc. All Rights Reserved."
