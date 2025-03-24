@@ -1,0 +1,38 @@
+#!/usr/bin/env python3
+"""
+[Your existing header comment]
+"""
+import os
+import re
+import argparse
+import subprocess
+import tempfile
+import json
+import logging
+from pathlib import Path
+from datetime import datetime  # <-- Already imported for timestamp
+
+def setup_logging():
+    """Configure logging with timestamped filename"""
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    log_file = os.path.join(os.getcwd(), f'copyright_updater_{timestamp}.log')
+    
+    logging.basicConfig(
+        filename=log_file,
+        level=logging.INFO,
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
+    console = logging.StreamHandler()
+    console.setLevel(logging.INFO)
+    formatter = logging.Formatter('%(message)s')
+    console.setFormatter(formatter)
+    logging.getLogger('').addHandler(console)
+    
+    logging.info(f"Log file: {log_file}")
+
+# [Rest of your existing code...]
+
+datetime.now().strftime("%Y-%m-%d")       # 2023-12-20
+datetime.now().strftime("%Y%m%dT%H%M%S")  # 20231220T143022 (ISO-like)
+
