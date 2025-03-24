@@ -1,3 +1,60 @@
+#!/usr/bin/env python3
+"""
+Copyright Header Updater v1.0
+
+A configurable script for managing copyright headers across source code files.
+
+Key Features:
+-----------------------------------------------------------
+1. Run Modes:
+   - dryrun (default): Preview changes without modifying files
+   - update: Apply copyright header updates
+
+2. File Processing:
+   - Supports multiple file types (Python, Java, Shell, Terraform, etc.)
+   - Preserves original file permissions and ownership
+   - Handles shebang lines (#!) appropriately
+   - Skips binary/non-text files automatically
+
+3. Configuration:
+   - Uses config.json for flexible setup:
+     * Custom copyright text
+     * File extension to language mapping
+     * Comment style definitions
+     * Directory exclusions
+   - Automatic detection via both file extensions and shebang patterns
+
+4. Logging:
+   - Detailed log file (copyright_updater.log) with timestamps
+   - Status tracking for each file:
+     * UPDATED: Header added/modified
+     * PASSED: Existing header detected
+     * SKIPPED: Unsupported file type
+     * ERROR: Processing failures
+   - End-of-run summary statistics
+
+5. Safety Features:
+   - Atomic file writes (temp file + replace)
+   - Complete dry-run capability
+   - Comprehensive error handling
+   - Backup-free operation (configurable)
+
+Usage:
+  copyright-updater [directory] [run_mode]
+  Example: copyright-updater /src/project update
+
+Dependencies:
+  - Python 3.8+
+  - python-magic (for file type detection)
+  - file command (system package)
+
+JSON Configuration:
+  See config.json for:
+  - Header formats per language
+  - File extension mappings
+  - Shebang patterns
+  - Excluded directories
+"""
 import os
 import re
 import argparse
