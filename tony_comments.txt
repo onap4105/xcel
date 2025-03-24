@@ -45,24 +45,16 @@ Test coverage reports (htmlcov, .coverage, .coverage.*)
 Cache directories (.mypy_cache/, .pytest_cache/)
 Jupyter Notebook checkpoints (.ipynb_checkpoints/)
 
-======================== ??? =================================
-I suggest adding a .pylintrc file and running pylint. I'll send you what I typically use 
-I also suggest using the tool called black. I'll send you a pyproject.toml file for that.
-==================================================================
-
-
-========================== ???? ===================
-I don't think that the code to look for the shbang language will recognize #!/usr/bin/env python3.12 as python. 
+12. I don't think that the code to look for the shbang language will recognize #!/usr/bin/env python3.12 as python. 
 Instead I recommend doing the tests in order from longest language string to the shortest string, and then just doing a langauge in first_line test. 
 Or use regular expressions to strip off any non-alphanumerics and split that into an array. And then test to see if the language is in the array. If you do this, you'll have to add "python2" and "python3" to your configuration list, as well as "perl5" and "perl6".
 In either case, DEFINITELY create a separate list of the shbang patterns from the configuration file, and SORT it longest to shortest. That forces sh to be found AFTER bash.
-=====================================================
 
 
- 
- 
-
-
+======================== ??? =================================
+I suggest adding a .pylintrc file and running pylint. I'll send you what I typically use 
+I also suggest using the tool called black. I'll send you a pyproject.toml file for that.
+=================================================================
 
 pyproject.toml
 .pylintrc
