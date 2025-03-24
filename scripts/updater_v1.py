@@ -72,3 +72,6 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+parser.add_argument("-s", "--unsupported-log", help="Separate log with the filenames whose language could not be determined", type=bool)
