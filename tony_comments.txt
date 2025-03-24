@@ -1,0 +1,61 @@
+Overall I think you have a great start. It looks very solid.
+ 
+I feel very strongly that the first line should be checked BEFORE looking at the extension. Extensions can lie. shbang is the final arbiter.
+ 
+I suggest adding a .pylintrc file and running pylint. I'll send you what I typically use
+ 
+I also suggest using the tool called black. I'll send you a pyproject.toml file for that.
+ 
+Specific suggestions:
+Your open() calls should specify an encoding, as in
+with open(config_path, 'r', encoding='utf-8') as f:
+ 
+I'm curious why you use 
+raise SystemExit(1)
+instead of 
+sys.exit(1)
+ 
+for the optional "run_mode", use a choices parameter, as in:
+ 
+parser.add_argument('run_mode', nargs='?', choices=['dryrun', 'update'], default='dryrun', help="Run mode: 'dryrun' or 'update'")
+Using --help will actually show those choices and prevent the use of anything else.
+ 
+Specific suggestion:
+Add an option 
+parser.add_argument("-s", "--unsupported-log", help="Separate log with the filenames whose language could not be determined", type=bool)
+ 
+and keep an additional log of just the filenames (full paths) there that were skipped. This allows someone, after doing the conversion, to easily do a vi $(<unsupported_files) and quickly take a look at each of the files that were unrecognized.
+ 
+IMO, it would be better to use the copyright symbol instead of the 3-character string (c).
+ 
+I don't think that the code to look for the shbang language will recognize #!/usr/bin/env python3.12 as python. 
+Instead I recommend doing the tests in order from longest language string to the shortest string, and then just doing a langauge in first_line test. 
+Or use regular expressions to strip off any non-alphanumerics and split that into an array. And then test to see if the language is in the array. If you do this, you'll have to add "python2" and "python3" to your configuration list, as well as "perl5" and "perl6".
+In either case, DEFINITELY create a separate list of the shbang patterns from the configuration file, and SORT it longest to shortest. That forces sh to be found AFTER bash.
+ 
+In the shbang_patterns in the config file, all of the shell langauge patterns should map to "shell" instead of "sh" to "sh" etc.
+ 
+Sometimes you use "shbang" and sometimes "shebang". Be consistent with "shbang".
+ 
+I think you'd be better served by using yaml instead of a json configuration file. Yaml allows comments.
+ 
+I asked copilot about typical directories that should be ignored in cases similar to this. It came back with this list:
+ 
+Typical directories and files to be ignored in a .gitignore file, especially for Python projects, include:
+Byte-compiled files (__pycache__, *.pyc, *.pyo)
+Virtual environment directories (venv, env)
+Distribution/build directories (build, dist, *.egg-info)
+IDE/editor configuration files and directories (e.g., .vscode/, .idea/)
+Temporary files and directories (*.tmp, *.log, *.swp, *.bak)
+Test coverage reports (htmlcov, .coverage, .coverage.*)
+Cache directories (.mypy_cache/, .pytest_cache/)
+Jupyter Notebook checkpoints (.ipynb_checkpoints/)
+ 
+ 
+You can use that to enhance your excluded directory list.
+ 
+In the config file, you have "// " for C/C++ but "//" (no space) for java. Curious why the latter?
+ 
+pyproject.toml
+.pylintrc
+ 
