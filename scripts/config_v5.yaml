@@ -82,3 +82,103 @@ exclude_dirs:
 
 # Copyright text template
 copyright_text: "Copyright (c) 2025 AT&T Inc. All Rights Reserved."
+
+
+fixes
+========================
+
+def setup_logging(config_dir: Path, unsupported_log: bool = False) -> None:
+    """Configure logging with timestamped filenames."""
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    main_log = config_dir / f'copyright_updater_{timestamp}.log'
+    
+    logging.basicConfig(
+        filename=str(main_log),
+        level=logging.INFO,
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
+    
+    # Clear any existing handlers
+    logging.getLogger().handlers.clear()
+    
+    # Main file handler
+    file_handler = logging.FileHandler(str(main_log))
+    file_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+    logging.getLogger().addHandler(file_handler)
+    
+    # Console handler
+    console = logging.StreamHandler()
+    console.setLevel(logging.INFO)
+    logging.getLogger().addHandler(console)
+    
+    # Unsupported files logger (separate instance)
+    unsupported_logger = logging.getLogger('unsupported')
+    unsupported_logger.propagate = False  # Prevent duplicate logging
+    
+    if unsupported_log:
+        unsupported_logfile = config_dir / f'unsupported_files_{timestamp}.log'
+        unsupported_handler = logging.FileHandler(str(unsupported_logfile))
+        unsupported_handler.setLevel(logging.WARNING)
+        unsupported_handler.setFormatter(logging.Formatter('%(message)s'))
+        unsupported_logger.addHandler(unsupported_handler)
+
+
+  ==================
+
+  def get_language(file_path: Path, config: Dict[str, Any], 
+                shbang_patterns: List[Tuple[str, str]]) -> Optional[str]:
+    """
+    Determine language from shbang line first, then fall back to extension.
+    Returns None if language cannot be determined.
+    """
+    # First check for shbang line
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            first_line = f.readline().strip()
+            if first_line.startswith('#!'):
+                components = extract_shbang_components(first_line)
+                
+                # Check patterns in order (longest first)
+                for lang, pattern in shbang_patterns:
+                    clean_pattern = re.sub(r'[^a-zA-Z0-9]', '', pattern.lower())
+                    if clean_pattern in components:
+                        return lang
+                
+                # If we get here, no pattern matched
+                unsupported_logger = logging.getLogger('unsupported')
+                unsupported_logger.warning(f"Unrecognized shbang: {first_line} in {file_path}")
+                
+    except Exception as ex:
+        unsupported_logger = logging.getLogger('unsupported')
+        unsupported_logger.warning(f"{file_path} - Read error: {ex}")
+        return None
+
+    # Fall back to extension if shbang check failed
+    ext = file_path.suffix[1:].lower()
+    language = config['extensions'].get(ext)
+    
+    if not language:
+        unsupported_logger = logging.getLogger('unsupported')
+        unsupported_logger.warning(f"Unsupported extension: {file_path}")
+    
+    return language
+
+    ============================
+
+    def is_text_file(file_path: Path) -> bool:
+    """Check if a file is a text file using the 'file' command."""
+    try:
+        result = subprocess.run(
+            ['file', '--mime-type', '-b', str(file_path)],
+            capture_output=True, text=True, check=True
+        )
+        is_text = result.stdout.strip().startswith('text/')
+        if not is_text:
+            unsupported_logger = logging.getLogger('unsupported')
+            unsupported_logger.warning(f"Non-text file: {file_path}")
+        return is_text
+    except subprocess.CalledProcessError as ex:
+        unsupported_logger = logging.getLogger('unsupported')
+        unsupported_logger.warning(f"{file_path} - File type detection failed: {ex}")
+        return False
