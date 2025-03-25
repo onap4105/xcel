@@ -1,0 +1,54 @@
+#!/usr/bin/env python3
+"""
+Copyright Header Updater v2.0
+
+KEY FEATURES:
+===================================================
+1. MULTI-LANGUAGE SUPPORT:
+   - 12+ languages (Python, C/C++, Java, Shell, etc.)
+   - Custom comment formats (prefix/suffix)
+   - Special cases (HTML/Markdown comments)
+
+2. INTELLIGENT FILE DETECTION:
+   - Shbang (#!) parsing with version support
+   - File extension fallback
+   - Sorted pattern matching (longest-first)
+
+3. SAFE OPERATION MODES:
+   - Dry-run preview
+   - Atomic writes with permission preservation
+   - Configurable exclusions (build/, .git/, etc.)
+
+4. ENHANCED LOGGING:
+   - Timestamped main log
+   - Separate unsupported files log (-s flag)
+   - Processing statistics
+
+5. FLEXIBLE CONFIGURATION:
+   - YAML-based config
+   - Per-language settings:
+     * Comment styles
+     * File extensions
+     * Shbang patterns
+   - Global copyright text
+
+6. ERROR HANDLING:
+   - Graceful skip for:
+     * Binary files
+     * Unsupported types
+     * Permission issues
+   - Detailed error logging
+
+USAGE:
+===================================================
+Basic:      ./updater.py [DIRECTORY] [dryrun|update]
+With logs:  ./updater.py [DIRECTORY] update -s
+
+CONFIGURATION:
+===================================================
+Edit config.yaml to:
+- Add new languages
+- Modify comment formats
+- Update file associations
+- Adjust excluded directories
+"""
