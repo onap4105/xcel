@@ -1,0 +1,181 @@
+#!/bin/bash
+# generate_test_files.sh - Creates test files for copyright header validation
+
+TEST_DIR="tests/test_data"
+
+# Create directory structure
+mkdir -p "$TEST_DIR"/{with_headers,no_headers}
+
+# -----------------------------------------------------------------------------
+# Python Files
+# -----------------------------------------------------------------------------
+
+# With header
+cat << 'EOF' > "$TEST_DIR/with_headers/example.py"
+#!/usr/bin/env python3
+# ---------------------------------------------------------------------------- #
+# Copyright (c) 2025 AT&T Inc. All Rights Reserved.                            #
+# ---------------------------------------------------------------------------- #
+
+def hello():
+    print("Existing Python file with header")
+EOF
+
+# Without header
+cat << 'EOF' > "$TEST_DIR/no_headers/script.py"
+def main():
+    print("Python file needing copyright header")
+EOF
+
+# -----------------------------------------------------------------------------
+# Java Files
+# -----------------------------------------------------------------------------
+
+# With header
+cat << 'EOF' > "$TEST_DIR/with_headers/sample.java"
+// ----------------------------------------------------------------------------
+// Copyright (c) 2025 AT&T Inc. All Rights Reserved.
+// ----------------------------------------------------------------------------
+
+public class Test {
+    public static void main(String[] args) {
+        System.out.println("Java with header");
+    }
+}
+EOF
+
+# Without header
+cat << 'EOF' > "$TEST_DIR/no_headers/program.java"
+public class Program {
+    void run() {
+        // Needs copyright
+    }
+}
+EOF
+
+# -----------------------------------------------------------------------------
+# Shell Scripts
+# -----------------------------------------------------------------------------
+
+# With header
+cat << 'EOF' > "$TEST_DIR/with_headers/test.sh"
+#!/bin/bash
+# ---------------------------------------------------------------------------- #
+# Copyright (c) 2025 AT&T Inc. All Rights Reserved.                            #
+# ---------------------------------------------------------------------------- #
+
+echo "Shell script with existing header"
+EOF
+
+# Without header
+cat << 'EOF' > "$TEST_DIR/no_headers/build.sh"
+#!/usr/bin/env bash
+
+echo "This build script needs a copyright"
+EOF
+
+# -----------------------------------------------------------------------------
+# C Files
+# -----------------------------------------------------------------------------
+
+cat << 'EOF' > "$TEST_DIR/no_headers/program.c"
+#include <stdio.h>
+
+int main() {
+    // No copyright in this C file
+    printf("Hello World\n");
+    return 0;
+}
+EOF
+
+# -----------------------------------------------------------------------------
+# YAML Files
+# -----------------------------------------------------------------------------
+
+# With header
+cat << 'EOF' > "$TEST_DIR/with_headers/config.yaml"
+# ---------------------------------------------------------------------------- #
+# Copyright (c) 2025 AT&T Inc. All Rights Reserved.                            #
+# ---------------------------------------------------------------------------- #
+
+config:
+  key: value
+  list:
+    - item1
+    - item2
+EOF
+
+# -----------------------------------------------------------------------------
+# HTML Files
+# -----------------------------------------------------------------------------
+
+cat << 'EOF' > "$TEST_DIR/no_headers/page.html"
+<!DOCTYPE html>
+<html>
+<!-- Missing copyright header -->
+<body>
+  <h1>Test Page</h1>
+</body>
+</html>
+EOF
+
+# -----------------------------------------------------------------------------
+# Markdown Files
+# -----------------------------------------------------------------------------
+
+# With header
+cat << 'EOF' > "$TEST_DIR/with_headers/README.md"
+<!-- ------------------------------------------------------------------------ -->
+<!-- Copyright (c) 2025 AT&T Inc. All Rights Reserved.                        -->
+<!-- ------------------------------------------------------------------------ -->
+
+# Project Title
+
+Project description...
+EOF
+
+# -----------------------------------------------------------------------------
+# Terraform Files
+# -----------------------------------------------------------------------------
+
+cat << 'EOF' > "$TEST_DIR/no_headers/main.tf"
+resource "aws_instance" "example" {
+  # Terraform config without header
+  ami           = "ami-0c55b159cbfafe1f0"
+  instance_type = "t2.micro"
+}
+EOF
+
+# -----------------------------------------------------------------------------
+# Perl Files
+# -----------------------------------------------------------------------------
+
+cat << 'EOF' > "$TEST_DIR/no_headers/script.pl"
+#!/usr/bin/perl
+
+print "Perl script missing copyright\n";
+EOF
+
+# -----------------------------------------------------------------------------
+# reStructuredText Files
+# -----------------------------------------------------------------------------
+
+# With header
+cat << 'EOF' > "$TEST_DIR/with_headers/docs.rst"
+.. ---------------------------------------------------------------------------
+.. Copyright (c) 2025 AT&T Inc. All Rights Reserved.
+.. ---------------------------------------------------------------------------
+
+Main Documentation
+=================
+EOF
+
+# -----------------------------------------------------------------------------
+# Final Output
+# -----------------------------------------------------------------------------
+
+echo "Generated test files in $TEST_DIR:"
+tree "$TEST_DIR"
+
+echo -e "\nTo remove all copyright headers later, run:"
+echo "./remove_copyright.sh"
