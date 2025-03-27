@@ -1,0 +1,105 @@
+def main() -> None:
+    """Main entry point for the script."""
+    parser = argparse.ArgumentParser(description='Add copyright headers to files.')
+    parser.add_argument('directory', type=str, help='Directory to process')
+    parser.add_argument('run_mode', nargs='?', default='dryrun',
+                      choices=['dryrun', 'update'],
+                      help="Run mode: 'dryrun' or 'update'")
+    parser.add_argument("-s", "--unsupported-log", 
+                      action='store_true',
+                      help="Create separate log for unsupported files")
+    args = parser.parse_args()
+
+    config_dir = Path(__file__).parent
+    setup_logging(config_dir, args.unsupported_log)
+    logging.info("=== Copyright Header Update Process Started ===")
+    
+    config, ext_to_lang, shbang_patterns = load_config()
+    root_dir = Path(args.directory)
+    dry_run = args.run_mode.lower() != 'update'
+
+    if not root_dir.is_dir():
+        logging.error("Invalid directory: %s", root_dir)
+        sys.exit(1)
+
+    # Process and normalize excluded directories
+    excluded_dirs = set()
+    for dir_path in config['exclude_dirs']:
+        # Normalize path format: strip slashes, standardize separators
+        normalized = dir_path.strip('/').replace(os.path.sep, '/')
+        excluded_dirs.add(normalized)
+
+    stats = {'processed': 0, 'updated': 0, 'passed': 0, 'errors': 0}
+    
+    for root, dirs, files in os.walk(root_dir):
+        # Get relative path from root directory
+        current_rel_path = os.path.relpath(root, root_dir)
+        if current_rel_path == '.':
+            current_rel_path = ''
+        else:
+            current_rel_path = current_rel_path.replace(os.path.sep, '/')
+
+        # Check if current directory is excluded
+        if current_rel_path in excluded_dirs:
+            dirs[:] = []  # Prune all subdirectories
+            continue
+
+        # Filter subdirectories for exclusion
+        new_dirs = []
+        for dir_name in dirs:
+            subdir_rel_path = f"{current_rel_path}/{dir_name}" if current_rel_path else dir_name
+            
+            if subdir_rel_path in excluded_dirs:
+                logging.debug("Skipping excluded directory: %s", subdir_rel_path)
+                continue
+                
+            new_dirs.append(dir_name)
+        dirs[:] = new_dirs  # Modify in-place to control traversal
+
+        # Process files in current directory
+        for file in files:
+            file_path = Path(root) / file
+            stats['processed'] += 1
+            
+            try:
+                if not is_text_file(file_path):
+                    logging.info("%s - SKIPPED - Non-text file", file_path)
+                    continue
+
+                language = get_language(file_path, ext_to_lang, shbang_patterns)
+                if not language:
+                    logging.info("%s - SKIPPED - Unsupported type", file_path)
+                    continue
+
+                header = generate_header(language, config)
+                if not header:
+                    logging.info("%s - SKIPPED - No header format", file_path)
+                    continue
+
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    content = f.read()
+
+                if check_existing_copyright(content, config):
+                    logging.info("%s - PASSED", file_path)
+                    stats['passed'] += 1
+                    continue
+
+                shbang_line, rest_content = parse_shbang(content)
+                
+                if dry_run:
+                    logging.info("%s - DRY_RUN", file_path)
+                else:
+                    update_file(file_path, header, shbang_line, rest_content)
+                    logging.info("%s - UPDATED", file_path)
+                    stats['updated'] += 1
+
+            except Exception as ex:
+                stats['errors'] += 1
+                logging.error("%s - ERROR - %s", file_path, ex)
+
+    logging.info("\n=== Processing Summary ===")
+    logging.info("Total files processed: %d", stats['processed'])
+    logging.info("Files updated:         %d", stats['updated'])
+    logging.info("Files passed:          %d", stats['passed'])
+    logging.info("Files with errors:     %d", stats['errors'])
+    logging.info("=== Process Completed ===")
