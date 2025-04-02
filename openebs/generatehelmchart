@@ -1,0 +1,2 @@
+# Split the combined manifest into separate files
+csplit all-manifests.yaml '/^---/' '{*}' --prefix=NEW_CHART_NAME/templates/template- --suffix=".yaml"
