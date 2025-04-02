@@ -2,3 +2,49 @@
 csplit all-manifests.yaml '/^---/' '{*}' --prefix=NEW_CHART_NAME/templates/template- --suffix=".yaml"
 
 https://kubernetes.io/docs/concepts/storage/volumes/#local
+
+
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: cstor-anti-affinity
+provisioner: openebs.io/provisioner-iscsi
+parameters:
+  cas-type: cstor
+  replicaCount: "3"  # 3 replicas
+  cstor.replicaAffinity: "topology.kubernetes.io/zone"  # Anti-affinity key
+  storagePool: cstor-anti-affinity-cluster  # Name of your CStorPoolCluster
+allowVolumeExpansion: true
+
+
+apiVersion: openebs.io/v1alpha1
+kind: CStorPoolCluster
+metadata:
+  name: cstor-anti-affinity-cluster
+  namespace: openebs
+spec:
+  pools:
+    # Pool on physical host 1
+    - nodeSelector:
+        topology.kubernetes.io/zone: host1  # Matches node label
+      dataRaidGroups:
+        - blockDevices:
+            - blockDeviceName: "/dev/sdb"  # Disk on a VM in host1
+      poolConfig:
+        dataRaidGroupType: "stripe"
+    # Pool on physical host 2
+    - nodeSelector:
+        topology.kubernetes.io/zone: host2
+      dataRaidGroups:
+        - blockDevices:
+            - blockDeviceName: "/dev/sdb"  # Disk on a VM in host2
+      poolConfig:
+        dataRaidGroupType: "stripe"
+    # Pool on physical host 3
+    - nodeSelector:
+        topology.kubernetes.io/zone: host3
+      dataRaidGroups:
+        - blockDevices:
+            - blockDeviceName: "/dev/sdb"  # Disk on a VM in host3
+      poolConfig:
+        dataRaidGroupType: "stripe"
