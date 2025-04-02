@@ -3,6 +3,7 @@ csplit all-manifests.yaml '/^---/' '{*}' --prefix=NEW_CHART_NAME/templates/templ
 
 https://kubernetes.io/docs/concepts/storage/volumes/#local
 
+kubectl label node <vm-node-name> topology.kubernetes.io/zone=host1
 
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
