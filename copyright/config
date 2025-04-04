@@ -77,4 +77,4 @@ exclude_dirs:
   - node_modules
 
 # Copyright text template
-copyright_text: "© 2025 AT&T Intellectual Property. All Rights Reserved."
+copyright_text: "© 2025 Intellectual Property. All Rights Reserved."
