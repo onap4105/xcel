@@ -1,0 +1,80 @@
+# Copyright header configuration
+# Each item is the language, followed by these items
+# (prefix and suffix) matched the beginning of a comment and ending of a comment (if any)
+# filename extensions used with this language,
+# and shbang (#!) patterns used to invoke the language
+
+languages:
+  python:
+    prefix: "# "
+    extensions:  [ "py", "py2", "py3" ]
+    shbang_patterns: [ "python3", "python2", "python" ]
+
+  c:
+    prefix: "// "
+    extensions: ["c","h"]
+
+  c++:
+    prefix: "// "
+    extensions: ["cpp","cc","c","C","H","hpp","hh","hxx","h"]
+
+  go:
+    prefix: "// "
+    extensions:
+      - go
+
+  shell:
+    prefix: "# "
+    extensions: ["sh","bash","ksh","eksh","zsh"]
+    shbang_patterns: ["bash","shell","dash","sh","ksh","eksh","csh","zsh"]
+
+  terraform:
+    prefix: "# "
+    extensions:
+      - tf
+
+  template:
+    prefix: "# "
+    extensions: ["tpl","tmpl","template"]
+
+  perl:
+    prefix: "# "
+    extensions: ["pl","pl5","pl6"]
+    shbang_patterns: ["perl6","perl5","perl"]
+
+  java:
+    prefix: "// "
+    extensions:
+      -  java
+
+  yaml:
+    prefix: "# "
+    extensions: ["yaml","yml"]
+
+  markdown:
+    prefix: "<!-- "
+    suffix: " -->"
+    extensions: ["md","markdown","mdown","mkdn","mdtxt","mdtext"]
+
+  restructured:
+    prefix: ".."
+    extensions: ["rst","rest"]
+
+  html:
+    prefix: "<!-- "
+    suffix: " -->"
+    extensions: ["html","htm"]
+
+# Directories to exclude from processing
+exclude_dirs:
+  - emptystate
+  - build
+  - Example
+  - example
+  - .git
+  - venv
+  - env
+  - node_modules
+
+# Copyright text template
+copyright_text: "© 2025 AT&T Intellectual Property. All Rights Reserved."
