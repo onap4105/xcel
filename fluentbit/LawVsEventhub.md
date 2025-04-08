@@ -228,3 +228,74 @@ spec:
       security.protocol: SASL_SSL
     topics: ??
     match: (*)
+
+Here's how to populate the Fluent Bit Kafka output configuration for your Azure-hosted Confluent Kafka service using OAuth authentication:
+
+```yaml
+spec:
+  kafka:
+    brokers: "333333333333.eastus2.azure.glb.confluent.cloud:9092"  # From IEBUS_BOOTSTRAP_SERVERS
+    topics: "alarm_process"  # From IEBUS_TOPIC
+    match: "*"
+    rdkafka:
+      debug: All
+      # OAuth 2.0 Configuration
+      security.protocol: "SASL_SSL"
+      sasl.mechanism: "OAUTHBEARER"  # Required for Azure AD OAuth
+      sasl.oauthbearer.client.id: "11111111111111"  # From IEBUS_CLIENT_ID
+      sasl.oauthbearer.client.secret: "xxxxxxx"  # From IEBUS_CLIENT_SECRET
+      sasl.oauthbearer.token.endpoint.url: "https://login.microsoftonline.com/222222222222222222/oauth2/v2.0/token"  # From IEBUS_TOKEN_URL
+      sasl.oauthbearer.scopes: "https://confluent.cloud/.default"  # Typically required for Confluent Cloud
+      # Confluent-specific extensions (from IEBUS_EXTENSIONS)
+      logical.cluster.id: "lkc-38zyqm"  # From logicalCluster in IEBUS_EXTENSIONS
+      # Optional: If using Azure Private Link/Advanced Networking
+      # client.id: "pool-9D3Y"  # From identityPoolId in IEBUS_EXTENSIONS
+```
+
+### Key Configuration Notes:
+1. **Authentication**:
+   - Use `OAUTHBEARER` mechanism (not `PLAIN`) for Azure AD authentication
+   - The `scopes` parameter is required for Azure AD token validation
+   - `sasl.username`/`sasl.password` are **not used** for OAuth
+
+2. **Confluent Cloud Specifics**:
+   ```yaml
+   logical.cluster.id: "lkc-38zyqm"  # From IEBUS_EXTENSIONS
+   ```
+   This helps Confluent Cloud route traffic correctly for multi-cluster setups.
+
+3. **Optional Identity Pool**:
+   If using identity pools for granular access control:
+   ```yaml
+   client.id: "pool-9D3Y"  # From identityPoolId in IEBUS_EXTENSIONS
+   ```
+
+4. **Security**:
+   - Port `9092` requires TLS (`security.protocol: SASL_SSL`)
+   - Consider using port `9093` (dedicated TLS port) if available
+
+### Verification Steps:
+1. Test connectivity from Fluent Bit pods:
+   ```bash
+   openssl s_client -connect 333333333333.eastus2.azure.glb.confluent.cloud:9092
+   ```
+
+2. Check token acquisition:
+   ```bash
+   curl -X POST -H "Content-Type: application/x-www-form-urlencoded" \
+   -d "client_id=11111111111111&client_secret=xxxxxxx&grant_type=client_credentials&scope=https://confluent.cloud/.default" \
+   "https://login.microsoftonline.com/222222222222222222/oauth2/v2.0/token"
+   ```
+
+### Proxy Configuration (if needed):
+If your firewall requires a proxy, add:
+```yaml
+rdkafka:
+  # ... other configs ...
+  proxy.url: "http://<proxy-host>:<proxy-port>"
+  # For authenticated proxies:
+  proxy.username: "<proxy-user>"
+  proxy.password: "<proxy-pass>"
+```
+
+This configuration assumes your Confluent Cloud cluster is configured to accept Azure AD OAuth tokens. You may need to coordinate with your Confluent Cloud administrator to ensure proper IAM mappings.
