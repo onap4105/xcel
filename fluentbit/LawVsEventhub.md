@@ -89,7 +89,15 @@ If your firewall blocks all non-proxy traffic, configure your log shipper (e.g.,
 ---
 
 ### **Summary**
-- **LAW** is ideal for direct log storage/analysis, while **Event Hub** is better for real-time streaming.  
+- **LAW** is ideal for direct log storage/analysis, while **Event Hub** is better for real-time streaming.
 - **Proxy is required for both** if your firewall blocks their respective protocols/ports.  
 - Use tools like Fluent Bit with proxy support to handle firewall restrictions.  
 - Always test connectivity with `curl` or `telnet` from your Kubernetes nodes to LAW/Event Hub endpoints.
+
+
+IEBUS_TOPIC ='alarm_process'
+IEBUS_CLIENT_ID = '11111111111111'
+IEBUS_CLIENT_SECRET = 'xxxxxxx'
+IEBUS_TOKEN_URL = 'https://login.microsoftonline.com/222222222222222222/oauth2/v2.0/token'
+IEBUS_BOOTSTRAP_SERVERS = '333333333333.eastus2.azure.glb.confluent.cloud:9092'
+IEBUS_EXTENSIONS = 'logicalCluster=lkc-38zyqm,identityPoolId=pool-9D3Y'
