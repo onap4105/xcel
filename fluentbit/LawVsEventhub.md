@@ -299,3 +299,105 @@ rdkafka:
 ```
 
 This configuration assumes your Confluent Cloud cluster is configured to accept Azure AD OAuth tokens. You may need to coordinate with your Confluent Cloud administrator to ensure proper IAM mappings.
+
+The error **`https://confluent.cloud was not found`** suggests either a **DNS resolution failure** or a **network/proxy misconfiguration** when attempting to acquire an OAuth token. Let’s break down the issue and resolve it:
+
+---
+
+### **Why This Happens**
+1. **Incorrect Scope Configuration**  
+   The `scope=https://confluent.cloud/.default` in your token request is a **permission identifier** for Confluent Cloud, not a resolvable URL. If your environment (or proxy) treats this scope as a URL to resolve, it will fail.
+
+2. **DNS/Network Restrictions**  
+   Your firewall or DNS may block access to the Azure AD token endpoint (`login.microsoftonline.com`) or Confluent Cloud domains (`*.confluent.cloud`).
+
+3. **Proxy Interference**  
+   If your cluster uses a proxy, it might be misconfigured or not whitelisting the required domains.
+
+---
+
+### **Step-by-Step Fixes**
+
+#### 1. **Verify Scope Syntax**
+   Ensure the `scope` parameter is **exactly** `https://confluent.cloud/.default` (no typos).  
+   Example `curl` command:
+   ```bash
+   curl -X POST -H "Content-Type: application/x-www-form-urlencoded" \
+   -d "client_id=11111111111111&client_secret=xxxxxxx&grant_type=client_credentials&scope=https://confluent.cloud/.default" \
+   "https://login.microsoftonline.com/222222222222222222/oauth2/v2.0/token"
+   ```
+
+#### 2. **Test Direct Connectivity**
+   From your Kubernetes cluster, check if you can reach Azure AD and Confluent Cloud:
+   ```bash
+   # Test Azure AD token endpoint
+   curl -v https://login.microsoftonline.com
+
+   # Test Confluent Cloud DNS resolution
+   nslookup 333333333333.eastus2.azure.glb.confluent.cloud
+   ```
+
+#### 3. **Check Proxy Configuration**
+   If your cluster uses a proxy:
+   - Ensure `login.microsoftonline.com` and `*.confluent.cloud` are whitelisted.
+   - Add proxy settings to your `curl` command:
+     ```bash
+     curl -x http://<proxy-host>:<proxy-port> -X POST ...  # Rest of the token request
+     ```
+
+#### 4. **Verify Azure AD App Registration**
+   Ensure your Azure AD app (`11111111111111`) has the **correct permissions** for Confluent Cloud:
+   - Navigate to **Azure Portal > App Registrations > Your App > API Permissions**.
+   - Add the delegated permission `https://confluent.cloud/.default` (if not already present).
+
+#### 5. **Test Token Acquisition Without Scope**
+   Temporarily remove the `scope` parameter to isolate the issue:
+   ```bash
+   curl -X POST -H "Content-Type: application/x-www-form-urlencoded" \
+   -d "client_id=11111111111111&client_secret=xxxxxxx&grant_type=client_credentials" \
+   "https://login.microsoftonline.com/222222222222222222/oauth2/v2.0/token"
+   ```
+   - If this succeeds, the `scope` value is invalid or misconfigured in Azure AD.
+
+---
+
+### **Expected Behavior**
+- **Successful Response** (with valid scope):
+  ```json
+  {
+    "token_type": "Bearer",
+    "expires_in": 3599,
+    "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6I..."
+  }
+  ```
+
+- **Common Errors**:
+  - `invalid_client`: Incorrect `client_id`/`client_secret`.
+  - `invalid_scope`: Scope not recognized by Azure AD.
+  - `404 Not Found`: DNS/proxy blocking access to `login.microsoftonline.com`.
+
+---
+
+### **Final Fixes**
+1. **Update Fluent Bit Configuration**  
+   Explicitly specify the `scope` in your Fluent Bit Kafka output:
+   ```yaml
+   rdkafka:
+     sasl.oauthbearer.scopes: "https://confluent.cloud/.default"
+   ```
+
+2. **Whitelist Domains in Firewall/Proxy**  
+   Allow outbound traffic to:
+   - `login.microsoftonline.com:443`
+   - `*.confluent.cloud:9092` (or `9093` for TLS).
+
+3. **Test Token Acquisition from a Pod**  
+   Run the `curl` command directly from a Kubernetes pod to rule out node-level issues:
+   ```bash
+   kubectl run -it --rm test-token --image=curlimages/curl --restart=Never -- \
+   curl -X POST -H "Content-Type: application/x-www-form-urlencoded" \
+   -d "client_id=11111111111111&client_secret=xxxxxxx&grant_type=client_credentials&scope=https://confluent.cloud/.default" \
+   "https://login.microsoftonline.com/222222222222222222/oauth2/v2.0/token"
+   ```
+
+If the issue persists, share the exact error message and HTTP status code from the `curl` command. This will help diagnose whether it’s a network, proxy, or Azure AD misconfiguration.
