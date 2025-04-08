@@ -216,7 +216,7 @@ IEBUS_TOKEN_URL = 'https://login.microsoftonline.com/222222222222222222/oauth2/v
 IEBUS_BOOTSTRAP_SERVERS = '333333333333.eastus2.azure.glb.confluent.cloud:9092'
 IEBUS_EXTENSIONS = 'logicalCluster=lkc-38zyqm,identityPoolId=pool-9D3Y'
 
-how to populate below configurations for a fluentbit output to an Azure kafka service?
+how to populate below configurations for a fluentbit output forward logs to an Azure kafka service?
 spec:
   kafka:
     brokers:??
