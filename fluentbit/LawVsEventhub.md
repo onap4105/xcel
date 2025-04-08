@@ -101,3 +101,108 @@ IEBUS_CLIENT_SECRET = 'xxxxxxx'
 IEBUS_TOKEN_URL = 'https://login.microsoftonline.com/222222222222222222/oauth2/v2.0/token'
 IEBUS_BOOTSTRAP_SERVERS = '333333333333.eastus2.azure.glb.confluent.cloud:9092'
 IEBUS_EXTENSIONS = 'logicalCluster=lkc-38zyqm,identityPoolId=pool-9D3Y'
+
+To determine if a **proxy is required** for connecting your Kubernetes cluster (behind a firewall) to the Azure-hosted Confluent Kafka service endpoint (`333333333333.eastus2.azure.glb.confluent.cloud:9092`), let’s analyze your configuration and firewall constraints:
+
+---
+
+### **1. Key Observations from Your Kafka Configuration**
+- **Bootstrap Server Port**: `9092` (typically used for **plaintext or SASL/SSL** connections in Confluent Cloud).
+- **Authentication**: OAuth 2.0 via Azure AD (`IEBUS_TOKEN_URL`, `IEBUS_CLIENT_ID`, `IEBUS_CLIENT_SECRET`).
+- **Logical Cluster**: `lkc-38zyqm` (Confluent Cloud cluster).
+
+---
+
+### **2. Does the Firewall Allow Outbound Traffic to Kafka Port 9092?**
+If your firewall **blocks outbound traffic to port 9092**, a proxy is required.  
+If the firewall allows traffic to `*.confluent.cloud:9092`, no proxy is needed.
+
+#### **Common Firewall Rules for Confluent Cloud**
+Confluent Cloud typically uses:
+- **Port 9092**: SASL/SSL (TLS-encrypted) or plaintext (not recommended).
+- **Port 9093**: Dedicated for SASL/SSL (TLS-encrypted).
+- **Port 443**: For REST Proxy or HTTP-based connections (e.g., Schema Registry).
+
+---
+
+### **3. Proxy Requirements for Kafka**
+#### **Scenario 1: Direct Connection to Port 9092**
+- **Proxy Needed?**  
+  - **Yes**, if your firewall blocks outbound traffic to port `9092`.  
+  - **No**, if port `9092` is allowed in firewall rules.  
+
+  **Verify connectivity**:  
+  ```bash
+  # Test connectivity from a Kubernetes pod
+  nc -zv 333333333333.eastus2.azure.glb.confluent.cloud 9092
+  ```
+
+#### **Scenario 2: Use Confluent REST Proxy (Port 443)**
+- If port `443` is allowed (common in firewalls), switch to the **REST Proxy** (HTTPS) instead of the native Kafka protocol.  
+- **No proxy needed** if port `443` is open.  
+- Example configuration:
+  ```python
+  # Example Python client using REST Proxy
+  from confluent_kafka import Producer
+
+  conf = {
+      'bootstrap.servers': '333333333333.eastus2.azure.glb.confluent.cloud:443',
+      'security.protocol': 'SASL_SSL',
+      'sasl.mechanism': 'OAUTHBEARER',
+      'oauth_cb': lambda _: ('IEBUS_CLIENT_ID', 'IEBUS_CLIENT_SECRET', 'IEBUS_TOKEN_URL')
+  }
+  producer = Producer(conf)
+  ```
+
+---
+
+### **4. If Proxy is Required**
+Configure your Kafka client to use a proxy for traffic routing:
+
+#### **Example: Using a Proxy with Confluent Kafka (Python)**
+```python
+conf = {
+    'bootstrap.servers': '333333333333.eastus2.azure.glb.confluent.cloud:9092',
+    'security.protocol': 'SASL_SSL',
+    'sasl.mechanism': 'OAUTHBEARER',
+    'oauth_cb': lambda _: ('IEBUS_CLIENT_ID', 'IEBUS_CLIENT_SECRET', 'IEBUS_TOKEN_URL'),
+    'proxy.host': 'your-proxy-host',
+    'proxy.port': 3128,  # Replace with your proxy port
+    # Add proxy auth if needed:
+    # 'proxy.username': 'user',
+    # 'proxy.password': 'pass'
+}
+producer = Producer(conf)
+```
+
+---
+
+### **5. Critical Recommendations**
+1. **Use SASL/SSL on Port 9093**:  
+   Avoid plaintext on port `9092`; switch to SASL/SSL on port `9093` for secure communication. Update your `IEBUS_BOOTSTRAP_SERVERS` to use `:9093`.
+
+2. **Check Firewall Rules**:  
+   Ensure your firewall allows outbound traffic to:
+   - `*.confluent.cloud:9093` (SASL/SSL).
+   - `login.microsoftonline.com:443` (OAuth token retrieval).
+
+3. **Test Connectivity**:  
+   Validate connectivity from a Kubernetes pod:
+   ```bash
+   # Test Kafka endpoint
+   openssl s_client -connect 333333333333.eastus2.azure.glb.confluent.cloud:9093
+
+   # Test OAuth token endpoint
+   curl -v https://login.microsoftonline.com/222222222222222222/oauth2/v2.0/token
+   ```
+
+4. **Proxy Configuration**:  
+   If a proxy is required, ensure your Kafka client supports proxy settings (e.g., `librdkafka`-based clients like `confluent-kafka-python`).
+
+---
+
+### **Summary**
+- **Proxy is required** if your firewall blocks port `9092`/`9093`.  
+- Use SASL/SSL on port `9093` instead of `9092` for security.  
+- If port `443` is open, use the **Confluent REST Proxy** to avoid proxy complexity.  
+- Always test connectivity from your Kubernetes cluster to Kafka and OAuth endpoints.
