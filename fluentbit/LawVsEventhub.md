@@ -409,3 +409,10 @@ curl -X POST \
   -d "grant_type=client_credentials" \
   -d "scope=https://confluent.cloud/.default" \
   "https://login.microsoftonline.com/222222222222222222/oauth2/v2.0/token"
+
+# In your Fluent Bit Deployment/DaemonSet:
+spec:
+  containers:
+    - name: fluent-bit
+      image: fluent/fluent-bit:debug  # Debug image with shell
+      command: ["/fluent-bit/bin/fluent-bit", "-c", "/fluent-bit/etc/fluent-bit.conf"]
