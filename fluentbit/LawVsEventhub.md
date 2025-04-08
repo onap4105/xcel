@@ -401,3 +401,11 @@ The error **`https://confluent.cloud was not found`** suggests either a **DNS re
    ```
 
 If the issue persists, share the exact error message and HTTP status code from the `curl` command. This will help diagnose whether it’s a network, proxy, or Azure AD misconfiguration.
+
+curl -X POST \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "client_id=11111111111111" \
+  -d "client_secret=xxxxxxx" \
+  -d "grant_type=client_credentials" \
+  -d "scope=https://confluent.cloud/.default" \
+  "https://login.microsoftonline.com/222222222222222222/oauth2/v2.0/token"
