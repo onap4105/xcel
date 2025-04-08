@@ -416,3 +416,31 @@ spec:
     - name: fluent-bit
       image: fluent/fluent-bit:debug  # Debug image with shell
       command: ["/fluent-bit/bin/fluent-bit", "-c", "/fluent-bit/etc/fluent-bit.conf"]
+
+
+spec:
+  kafka:
+    brokers: g30jdg.eastus2.azure.glb.confluent.cloud:9092
+    topics: netcool_alarm_process
+    matchRegex: (audit_tag|app_evh_tag)
+    rdkafka:
+      debug: All
+      # OAuth 2.0 Configuration
+      security.protocol: SASL_SSL
+      sasl.mechanism: OAUTHBEARER
+      sasl.oauthbearer.client.id: 587ff4fbf9ba
+      sasl.oauthbearer.client.secret: kkkkkkkkkkkkkkkkkk
+      sasl.oauthbearer.token.endpoint.url: https://login.microsoftonline.com/0f3b32b07556/oauth2/v2.0/token
+      sasl.oauthbearer.scope: https://confluent.cloud/.default
+
+     # Optional additional configurations for better performance and reliability
+     bootstrap.servers: g30jdg.eastus2.azure.glb.confluent.cloud:9092
+     client.id: 587ff4fbf9ba
+
+       # Confluent-specific extensions (from IEBUS_EXTENSIONS)
+       logical.cluster.id: 38zyqm
+
+      # Adding identityPoolId (from IEBUS_EXTENSIONS)
+      identityPoolId: 9D3Y
+
+
