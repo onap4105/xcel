@@ -206,3 +206,25 @@ producer = Producer(conf)
 - Use SASL/SSL on port `9093` instead of `9092` for security.  
 - If port `443` is open, use the **Confluent REST Proxy** to avoid proxy complexity.  
 - Always test connectivity from your Kubernetes cluster to Kafka and OAuth endpoints.
+
+### **fluentbit output config**
+based on these values
+IEBUS_TOPIC ='alarm_process'
+IEBUS_CLIENT_ID = '11111111111111'
+IEBUS_CLIENT_SECRET = 'xxxxxxx'
+IEBUS_TOKEN_URL = 'https://login.microsoftonline.com/222222222222222222/oauth2/v2.0/token'
+IEBUS_BOOTSTRAP_SERVERS = '333333333333.eastus2.azure.glb.confluent.cloud:9092'
+IEBUS_EXTENSIONS = 'logicalCluster=lkc-38zyqm,identityPoolId=pool-9D3Y'
+
+how to populate below configurations for a fluentbit output to an Azure kafka service?
+spec:
+  kafka:
+    brokers:??
+    rdkafka:
+      debug: All
+      sasl.mechanism: PLAIN
+      sasl.password: Endpoint=sb://<??>/;SharedAccessKeyName=<??>;SharedAccessKey=<??>
+      sasl.username: ??
+      security.protocol: SASL_SSL
+    topics: ??
+    match: (*)
