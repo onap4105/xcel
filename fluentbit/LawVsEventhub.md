@@ -443,4 +443,80 @@ spec:
       # Adding identityPoolId (from IEBUS_EXTENSIONS)
       identityPoolId: 9D3Y
 
+Here are the issues and corrections for your Fluent Bit Kafka configuration:
+
+### **1. Key Issues**
+1. **Incorrect YAML Indentation**: Misaligned properties (e.g., `logical.cluster.id`, `identityPoolId`).
+2. **Redundant `bootstrap.servers`**: Already defined via `brokers`.
+3. **Invalid `matchRegex` Syntax**: Fluent Bit uses `match`/`Match` with regex patterns.
+4. **Missing Confluent-Specific Prefix**: `logical.cluster.id` and `identityPoolId` require `confluent.` prefix.
+5. **Mismatched `client.id`**: Should be a descriptive identifier, not the OAuth client ID.
+
+---
+
+### **Corrected Configuration**
+```yaml
+spec:
+  kafka:
+    brokers: "g30jdg.eastus2.azure.glb.confluent.cloud:9092"
+    topics: "netcool_alarm_process"
+    match: "audit_tag|app_evh_tag"  # Use `match` with regex pattern
+    rdkafka:
+      debug: "All"
+      # OAuth 2.0 Configuration
+      security.protocol: "SASL_SSL"
+      sasl.mechanism: "OAUTHBEARER"
+      sasl.oauthbearer.client.id: "587ff4fbf9ba"
+      sasl.oauthbearer.client.secret: "kkkkkkkkkkkkkkkkkk"
+      sasl.oauthbearer.token.endpoint.url: "https://login.microsoftonline.com/0f3b32b07556/oauth2/v2.0/token"
+      sasl.oauthbearer.scopes: "https://confluent.cloud/.default"
+      # Confluent-specific extensions
+      confluent.logical.cluster.id: "38zyqm"  # Add `confluent.` prefix
+      confluent.identity.pool.id: "9D3Y"      # Adjusted property name
+      # Producer settings
+      client.id: "fluent-bit-producer"  # Descriptive client ID
+```
+
+---
+
+### **Key Fixes**
+1. **Fixed Indentation**: Aligned YAML structure.
+2. **Removed Redundancy**:
+   - Deleted `bootstrap.servers` (use `brokers` instead).
+3. **Confluent-Specific Properties**:
+   - `confluent.logical.cluster.id`: Required for Confluent Cloud multi-cluster routing.
+   - `confluent.identity.pool.id`: Maps to `identityPoolId` from your `IEBUS_EXTENSIONS`.
+4. **Corrected `match` Syntax**:
+   - Use `match: "audit_tag|app_evh_tag"` instead of `matchRegex`.
+5. **Adjusted `client.id`**:
+   - Use a unique identifier (e.g., `fluent-bit-producer`) instead of the OAuth client ID.
+
+---
+
+### **Additional Recommendations**
+1. **Use Port `9093` for TLS**:
+   ```yaml
+   brokers: "g30jdg.eastus2.azure.glb.confluent.cloud:9093"  # Port 9093 for SASL_SSL
+   ```
+2. **Test Token Acquisition**:
+   ```bash
+   curl -X POST \
+     -d "client_id=587ff4fbf9ba" \
+     -d "client_secret=kkkkkkkkkkkkkkkkkk" \
+     -d "grant_type=client_credentials" \
+     -d "scope=https://confluent.cloud/.default" \
+     "https://login.microsoftonline.com/0f3b32b07556/oauth2/v2.0/token"
+   ```
+3. **Verify Connectivity**:
+   ```bash
+   openssl s_client -connect g30jdg.eastus2.azure.glb.confluent.cloud:9093
+   ```
+
+---
+
+### **Final Notes**
+- Ensure your Azure AD app (`client_id=587ff4fbf9ba`) has permissions in Confluent Cloud.
+- The `confluent.*` properties are critical for Confluent Cloud’s IAM and routing.
+- Use a debug image for troubleshooting if needed (as discussed earlier).
+
 
