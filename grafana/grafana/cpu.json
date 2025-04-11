@@ -1,0 +1,179 @@
+{
+  "datasource": {
+    "uid": "$datasource"
+  },
+  "fieldConfig": {
+    "defaults": {
+      "custom": {
+        "drawStyle": "line",
+        "lineInterpolation": "linear",
+        "barAlignment": 0,
+        "lineWidth": 0,
+        "fillOpacity": 100,
+        "gradientMode": "none",
+        "spanNulls": false,
+        "insertNulls": false,
+        "showPoints": "never",
+        "pointSize": 5,
+        "stacking": {
+          "mode": "normal",
+          "group": "A"
+        },
+        "axisPlacement": "auto",
+        "axisLabel": "",
+        "axisColorMode": "text",
+        "axisBorderShow": false,
+        "scaleDistribution": {
+          "type": "linear"
+        },
+        "axisCenteredZero": false,
+        "hideFrom": {
+          "tooltip": false,
+          "viz": false,
+          "legend": false
+        },
+        "thresholdsStyle": {
+          "mode": "off"
+        }
+      },
+      "color": {
+        "mode": "palette-classic"
+      },
+      "mappings": [],
+      "thresholds": {
+        "mode": "absolute",
+        "steps": [
+          {
+            "color": "green",
+            "value": null
+          },
+          {
+            "color": "red",
+            "value": 80
+          }
+        ]
+      },
+      "min": 0,
+      "unit": "short"
+    },
+    "overrides": [
+      {
+        "matcher": {
+          "id": "byName",
+          "options": "requests"
+        },
+        "properties": [
+          {
+            "id": "color",
+            "value": {
+              "fixedColor": "#F2495C",
+              "mode": "fixed"
+            }
+          },
+          {
+            "id": "custom.fillOpacity",
+            "value": 0
+          },
+          {
+            "id": "custom.lineWidth",
+            "value": 2
+          },
+          {
+            "id": "custom.stacking",
+            "value": {
+              "group": "A",
+              "mode": "none"
+            }
+          }
+        ]
+      },
+      {
+        "matcher": {
+          "id": "byName",
+          "options": "limits"
+        },
+        "properties": [
+          {
+            "id": "color",
+            "value": {
+              "fixedColor": "#FF9830",
+              "mode": "fixed"
+            }
+          },
+          {
+            "id": "custom.fillOpacity",
+            "value": 0
+          },
+          {
+            "id": "custom.lineWidth",
+            "value": 2
+          },
+          {
+            "id": "custom.stacking",
+            "value": {
+              "group": "A",
+              "mode": "none"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "gridPos": {
+    "h": 7,
+    "w": 24,
+    "x": 0,
+    "y": 1
+  },
+  "id": 1,
+  "interval": "1m",
+  "options": {
+    "tooltip": {
+      "mode": "single",
+      "sort": "none"
+    },
+    "legend": {
+      "showLegend": true,
+      "displayMode": "table",
+      "placement": "right",
+      "calcs": []
+    }
+  },
+  "targets": [
+    {
+      "datasource": {
+        "uid": "$datasource"
+      },
+      "expr": "sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{namespace=\"$namespace\", pod=\"$pod\", cluster=\"$cluster\"}) by (container)",
+      "format": "time_series",
+      "intervalFactor": 2,
+      "legendFormat": "{{ container }}",
+      "refId": "A",
+      "step": 10
+    },
+    {
+      "datasource": {
+        "uid": "$datasource"
+      },
+      "expr": "sum(\n    kube_pod_container_resource_requests{job=\"kube-state-metrics\", cluster=\"$cluster\", namespace=\"$namespace\", pod=\"$pod\", resource=\"cpu\"}\n)\n",
+      "format": "time_series",
+      "intervalFactor": 2,
+      "legendFormat": "requests",
+      "refId": "B",
+      "step": 10
+    },
+    {
+      "datasource": {
+        "uid": "$datasource"
+      },
+      "expr": "sum(\n    kube_pod_container_resource_limits{job=\"kube-state-metrics\", cluster=\"$cluster\", namespace=\"$namespace\", pod=\"$pod\", resource=\"cpu\"}\n)\n",
+      "format": "time_series",
+      "intervalFactor": 2,
+      "legendFormat": "limits",
+      "refId": "C",
+      "step": 10
+    }
+  ],
+  "title": "CPU Usage",
+  "type": "timeseries"
+}
