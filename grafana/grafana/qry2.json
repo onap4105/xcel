@@ -1,0 +1,153 @@
+{
+  "request": {
+    "url": "api/ds/query?ds_type=prometheus&requestId=Q2316",
+    "method": "POST",
+    "data": {
+      "queries": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum(increase(container_cpu_cfs_throttled_periods_total{job=\"kubelet\", metrics_path=\"/metrics/cadvisor\", namespace=\"com-att-sadcu-collgrp1-test\", pod=\"l2-dcu-syslog-filebeat-qjjkz\", container!=\"\", cluster=\"\"}[$__rate_interval])) by (container) /sum(increase(container_cpu_cfs_periods_total{job=\"kubelet\", metrics_path=\"/metrics/cadvisor\", namespace=\"com-att-sadcu-collgrp1-test\", pod=\"l2-dcu-syslog-filebeat-qjjkz\", container!=\"\", cluster=\"\"}[$__rate_interval])) by (container)",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "{{ container }}",
+          "refId": "A",
+          "step": 10,
+          "exemplar": false,
+          "requestId": "2A",
+          "utcOffsetSec": 0,
+          "interval": "",
+          "datasourceId": 1,
+          "intervalMs": 60000,
+          "maxDataPoints": 2386
+        }
+      ],
+      "from": "1744384908104",
+      "to": "1744388508104"
+    },
+    "hideFromInspector": false
+  },
+  "response": {
+    "results": {
+      "A": {
+        "status": 200,
+        "frames": [
+          {
+            "schema": {
+              "refId": "A",
+              "meta": {
+                "type": "timeseries-multi",
+                "typeVersion": [
+                  0,
+                  1
+                ],
+                "custom": {
+                  "resultType": "matrix"
+                },
+                "executedQueryString": "Expr: sum(increase(container_cpu_cfs_throttled_periods_total{job=\"kubelet\", metrics_path=\"/metrics/cadvisor\", namespace=\"com-att-sadcu-collgrp1-test\", pod=\"l2-dcu-syslog-filebeat-qjjkz\", container!=\"\", cluster=\"\"}[20m0s])) by (container) /sum(increase(container_cpu_cfs_periods_total{job=\"kubelet\", metrics_path=\"/metrics/cadvisor\", namespace=\"com-att-sadcu-collgrp1-test\", pod=\"l2-dcu-syslog-filebeat-qjjkz\", container!=\"\", cluster=\"\"}[20m0s])) by (container)\nStep: 2m0s"
+              },
+              "fields": [
+                {
+                  "name": "Time",
+                  "type": "time",
+                  "typeInfo": {
+                    "frame": "time.Time"
+                  },
+                  "config": {
+                    "interval": 120000
+                  }
+                },
+                {
+                  "name": "Value",
+                  "type": "number",
+                  "typeInfo": {
+                    "frame": "float64"
+                  },
+                  "labels": {
+                    "container": "filebeat"
+                  },
+                  "config": {
+                    "displayNameFromDS": "filebeat"
+                  }
+                }
+              ]
+            },
+            "data": {
+              "values": [
+                [
+                  1744384800000,
+                  1744384920000,
+                  1744385040000,
+                  1744385160000,
+                  1744385280000,
+                  1744385400000,
+                  1744385520000,
+                  1744385640000,
+                  1744385760000,
+                  1744385880000,
+                  1744386000000,
+                  1744386120000,
+                  1744386240000,
+                  1744386360000,
+                  1744386480000,
+                  1744386600000,
+                  1744386720000,
+                  1744386840000,
+                  1744386960000,
+                  1744387080000,
+                  1744387200000,
+                  1744387320000,
+                  1744387440000,
+                  1744387560000,
+                  1744387680000,
+                  1744387800000,
+                  1744387920000,
+                  1744388040000,
+                  1744388160000,
+                  1744388280000,
+                  1744388400000
+                ],
+                [
+                  0.6482213438735178,
+                  0.6495436766623207,
+                  0.6495436766623207,
+                  0.6495436766623207,
+                  0.6556776556776557,
+                  0.6556776556776557,
+                  0.6595300261096606,
+                  0.6595300261096606,
+                  0.6595300261096606,
+                  0.6577216521967904,
+                  0.6577216521967904,
+                  0.6598478888014686,
+                  0.6598478888014686,
+                  0.6598478888014686,
+                  0.6596138587675218,
+                  0.6596138587675218,
+                  0.6611635220125787,
+                  0.6611635220125787,
+                  0.6611635220125787,
+                  0.6580132450331126,
+                  0.6580132450331126,
+                  0.6678947368421053,
+                  0.6678947368421053,
+                  0.6678947368421053,
+                  0.6730259671436142,
+                  0.6730259671436142,
+                  0.6691137912952282,
+                  0.6691137912952282,
+                  0.6691137912952282,
+                  0.6578669482576558,
+                  0.6578669482576558
+                ]
+              ]
+            }
+          }
+        ],
+        "refId": "A"
+      }
+    }
+  }
+}
