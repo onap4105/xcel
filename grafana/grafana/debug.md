@@ -98,3 +98,13 @@ If you still see no data, share:
 - Output of `kubectl get pods -n monitoring` (to verify components),
 - Screenshot of Prometheus targets,
 - Relevant excerpts from Prometheus logs (`kubectl logs <prometheus-pod>`).
+
+
+    ## If true, a nil or {} value for prometheus.prometheusSpec.ruleSelector will cause the
+    ## prometheus resource to be created with selectors based on values in the helm deployment,
+    ## which will also match the PrometheusRule resources created
+    ##
+    ruleSelectorNilUsesHelmValues: true
+
+
+
