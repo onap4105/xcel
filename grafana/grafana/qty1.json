@@ -1,0 +1,326 @@
+{
+  "request": {
+    "url": "api/ds/query?ds_type=prometheus&requestId=Q2352",
+    "method": "POST",
+    "data": {
+      "queries": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{namespace=\"com-att-sadcu-collgrp1-test\", pod=\"l2-dcu-syslog-filebeat-qjjkz\", cluster=\"\"}) by (container)",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "{{ container }}",
+          "refId": "A",
+          "step": 10,
+          "exemplar": false,
+          "requestId": "1A",
+          "utcOffsetSec": 0,
+          "interval": "",
+          "datasourceId": 1,
+          "intervalMs": 60000,
+          "maxDataPoints": 2386
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum(\n    kube_pod_container_resource_requests{job=\"kube-state-metrics\", cluster=\"\", namespace=\"com-att-sadcu-collgrp1-test\", pod=\"l2-dcu-syslog-filebeat-qjjkz\", resource=\"cpu\"}\n)\n",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "requests",
+          "refId": "B",
+          "step": 10,
+          "exemplar": false,
+          "requestId": "1B",
+          "utcOffsetSec": 0,
+          "interval": "",
+          "datasourceId": 1,
+          "intervalMs": 60000,
+          "maxDataPoints": 2386
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum(\n    kube_pod_container_resource_limits{job=\"kube-state-metrics\", cluster=\"\", namespace=\"com-att-sadcu-collgrp1-test\", pod=\"l2-dcu-syslog-filebeat-qjjkz\", resource=\"cpu\"}\n)\n",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "limits",
+          "refId": "C",
+          "step": 10,
+          "exemplar": false,
+          "requestId": "1C",
+          "utcOffsetSec": 0,
+          "interval": "",
+          "datasourceId": 1,
+          "intervalMs": 60000,
+          "maxDataPoints": 2386
+        }
+      ],
+      "from": "1744384994378",
+      "to": "1744388594379"
+    },
+    "hideFromInspector": false
+  },
+  "response": {
+    "results": {
+      "A": {
+        "status": 200,
+        "frames": [
+          {
+            "schema": {
+              "refId": "A",
+              "meta": {
+                "typeVersion": [
+                  0,
+                  0
+                ],
+                "executedQueryString": "Expr: sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{namespace=\"com-att-sadcu-collgrp1-test\", pod=\"l2-dcu-syslog-filebeat-qjjkz\", cluster=\"\"}) by (container)\nStep: 2m0s"
+              },
+              "fields": []
+            },
+            "data": {
+              "values": []
+            }
+          }
+        ],
+        "refId": "A"
+      },
+      "B": {
+        "status": 200,
+        "frames": [
+          {
+            "schema": {
+              "refId": "B",
+              "meta": {
+                "type": "timeseries-multi",
+                "typeVersion": [
+                  0,
+                  1
+                ],
+                "custom": {
+                  "resultType": "matrix"
+                },
+                "executedQueryString": "Expr: sum(\n    kube_pod_container_resource_requests{job=\"kube-state-metrics\", cluster=\"\", namespace=\"com-att-sadcu-collgrp1-test\", pod=\"l2-dcu-syslog-filebeat-qjjkz\", resource=\"cpu\"}\n)\n\nStep: 2m0s"
+              },
+              "fields": [
+                {
+                  "name": "Time",
+                  "type": "time",
+                  "typeInfo": {
+                    "frame": "time.Time"
+                  },
+                  "config": {
+                    "interval": 120000
+                  }
+                },
+                {
+                  "name": "Value",
+                  "type": "number",
+                  "typeInfo": {
+                    "frame": "float64"
+                  },
+                  "labels": {},
+                  "config": {
+                    "displayNameFromDS": "requests"
+                  }
+                }
+              ]
+            },
+            "data": {
+              "values": [
+                [
+                  1744384920000,
+                  1744385040000,
+                  1744385160000,
+                  1744385280000,
+                  1744385400000,
+                  1744385520000,
+                  1744385640000,
+                  1744385760000,
+                  1744385880000,
+                  1744386000000,
+                  1744386120000,
+                  1744386240000,
+                  1744386360000,
+                  1744386480000,
+                  1744386600000,
+                  1744386720000,
+                  1744386840000,
+                  1744386960000,
+                  1744387080000,
+                  1744387200000,
+                  1744387320000,
+                  1744387440000,
+                  1744387560000,
+                  1744387680000,
+                  1744387800000,
+                  1744387920000,
+                  1744388040000,
+                  1744388160000,
+                  1744388280000,
+                  1744388400000,
+                  1744388520000
+                ],
+                [
+                  0.03,
+                  0.03,
+                  0.03,
+                  0.03,
+                  0.03,
+                  0.03,
+                  0.03,
+                  0.03,
+                  0.03,
+                  0.03,
+                  0.03,
+                  0.03,
+                  0.03,
+                  0.03,
+                  0.03,
+                  0.03,
+                  0.03,
+                  0.03,
+                  0.03,
+                  0.03,
+                  0.03,
+                  0.03,
+                  0.03,
+                  0.03,
+                  0.03,
+                  0.03,
+                  0.03,
+                  0.03,
+                  0.03,
+                  0.03,
+                  0.03
+                ]
+              ]
+            }
+          }
+        ],
+        "refId": "B"
+      },
+      "C": {
+        "status": 200,
+        "frames": [
+          {
+            "schema": {
+              "refId": "C",
+              "meta": {
+                "type": "timeseries-multi",
+                "typeVersion": [
+                  0,
+                  1
+                ],
+                "custom": {
+                  "resultType": "matrix"
+                },
+                "executedQueryString": "Expr: sum(\n    kube_pod_container_resource_limits{job=\"kube-state-metrics\", cluster=\"\", namespace=\"com-att-sadcu-collgrp1-test\", pod=\"l2-dcu-syslog-filebeat-qjjkz\", resource=\"cpu\"}\n)\n\nStep: 2m0s"
+              },
+              "fields": [
+                {
+                  "name": "Time",
+                  "type": "time",
+                  "typeInfo": {
+                    "frame": "time.Time"
+                  },
+                  "config": {
+                    "interval": 120000
+                  }
+                },
+                {
+                  "name": "Value",
+                  "type": "number",
+                  "typeInfo": {
+                    "frame": "float64"
+                  },
+                  "labels": {},
+                  "config": {
+                    "displayNameFromDS": "limits"
+                  }
+                }
+              ]
+            },
+            "data": {
+              "values": [
+                [
+                  1744384920000,
+                  1744385040000,
+                  1744385160000,
+                  1744385280000,
+                  1744385400000,
+                  1744385520000,
+                  1744385640000,
+                  1744385760000,
+                  1744385880000,
+                  1744386000000,
+                  1744386120000,
+                  1744386240000,
+                  1744386360000,
+                  1744386480000,
+                  1744386600000,
+                  1744386720000,
+                  1744386840000,
+                  1744386960000,
+                  1744387080000,
+                  1744387200000,
+                  1744387320000,
+                  1744387440000,
+                  1744387560000,
+                  1744387680000,
+                  1744387800000,
+                  1744387920000,
+                  1744388040000,
+                  1744388160000,
+                  1744388280000,
+                  1744388400000,
+                  1744388520000
+                ],
+                [
+                  0.1,
+                  0.1,
+                  0.1,
+                  0.1,
+                  0.1,
+                  0.1,
+                  0.1,
+                  0.1,
+                  0.1,
+                  0.1,
+                  0.1,
+                  0.1,
+                  0.1,
+                  0.1,
+                  0.1,
+                  0.1,
+                  0.1,
+                  0.1,
+                  0.1,
+                  0.1,
+                  0.1,
+                  0.1,
+                  0.1,
+                  0.1,
+                  0.1,
+                  0.1,
+                  0.1,
+                  0.1,
+                  0.1,
+                  0.1,
+                  0.1
+                ]
+              ]
+            }
+          }
+        ],
+        "refId": "C"
+      }
+    }
+  }
+}
