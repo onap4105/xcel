@@ -1,0 +1,27 @@
+hg4105@mtrn4607ncms01:~$ grep job_name prometheus.env.yaml
+- job_name: serviceMonitor/prometheus/kstack-kube-state-metrics/0
+    target_label: __tmp_prometheus_job_name
+- job_name: serviceMonitor/prometheus/kstack-prometheus-node-exporter/0
+    target_label: __tmp_prometheus_job_name
+- job_name: serviceMonitor/prometheus/stack-apiserver/0
+    target_label: __tmp_prometheus_job_name
+- job_name: serviceMonitor/prometheus/stack-coredns/0
+    target_label: __tmp_prometheus_job_name
+- job_name: serviceMonitor/prometheus/stack-kube-controller-manager/0
+    target_label: __tmp_prometheus_job_name
+- job_name: serviceMonitor/prometheus/stack-kube-etcd/0
+    target_label: __tmp_prometheus_job_name
+- job_name: serviceMonitor/prometheus/stack-kube-proxy/0
+    target_label: __tmp_prometheus_job_name
+- job_name: serviceMonitor/prometheus/stack-kube-scheduler/0
+    target_label: __tmp_prometheus_job_name
+- job_name: serviceMonitor/prometheus/stack-kubelet/0
+    target_label: __tmp_prometheus_job_name
+- job_name: serviceMonitor/prometheus/stack-kubelet/1
+    target_label: __tmp_prometheus_job_name
+- job_name: serviceMonitor/prometheus/stack-kubelet/2
+    target_label: __tmp_prometheus_job_name
+- job_name: serviceMonitor/prometheus/stack-operator/0
+    target_label: __tmp_prometheus_job_name
+- job_name: serviceMonitor/prometheus/stack-prometheus/0
+    target_label: __tmp_prometheus_job_name
