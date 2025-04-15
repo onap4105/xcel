@@ -1,0 +1,21 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    meta.helm.sh/release-name: ndcu-vault
+    meta.helm.sh/release-namespace: ndcu-vault
+  creationTimestamp: "2024-06-20T16:03:26Z"
+  labels:
+    app.kubernetes.io/instance: ndcu-vault
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vault-csi-provider
+  name: ndcu-vault-csi-provider-clusterrole
+  resourceVersion: "766353"
+  uid: 6a8c48cf-7b19-4318-b666-a842bfdb41a9
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - serviceaccounts/token
+  verbs:
+  - create
