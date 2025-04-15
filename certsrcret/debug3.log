@@ -1,0 +1,2 @@
+2025-04-15T16:10:27.155Z [WARN]  server.provider: Error generating HMAC key. Mounted secrets will not be assigned a version: error="secrets \"vault-csi-provider-hmac-key\" is forbidden: User \"system:serviceaccount:ndcu-vault:ndcu-vault-csi-provider\" cannot get resource \"secrets\" in API group \"\" in the namespace \"ndcu-vault\""
+2025-04-15T16:11:27.172Z [INFO]  server: Finished unary gRPC call: grpc.method=/v1alpha1.CSIDriverProvider/Mount grpc.time=1m0.029006511s grpc.code=Unknown err="error making mount request: failed to login: context deadline exceeded"
