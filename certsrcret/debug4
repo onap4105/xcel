@@ -1,0 +1,30 @@
+$ curl -k -v -I https://ndcu-vault.ndcu-vault:8200
+* SSLv3, TLS handshake, Client hello (1):
+* SSLv3, TLS handshake, Server hello (2):
+* SSLv3, TLS handshake, CERT (11):
+* SSLv3, TLS handshake, Server key exchange (12):
+* SSLv3, TLS handshake, Request CERT (13):
+* SSLv3, TLS handshake, Server finished (14):
+* SSLv3, TLS handshake, CERT (11):
+* SSLv3, TLS handshake, Client key exchange (16):
+* SSLv3, TLS change cipher, Client hello (1):
+* SSLv3, TLS handshake, Finished (20):
+* SSLv3, TLS change cipher, Client hello (1):
+* SSLv3, TLS handshake, Finished (20):
+> HEAD / HTTP/1.1
+> User-Agent: curl/7.35.0
+> Host: ndcu-vault.ndcu-vault:8200
+> Accept: */*
+>
+< HTTP/1.1 307 Temporary Redirect
+HTTP/1.1 307 Temporary Redirect
+< Cache-Control: no-store
+Cache-Control: no-store
+< Content-Type: text/html; charset=utf-8
+Content-Type: text/html; charset=utf-8
+< Location: /ui/
+Location: /ui/
+< Strict-Transport-Security: max-age=31536000; includeSubDomains
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+< Date: Tue, 15 Apr 2025 17:46:40 GMT
+Date: Tue, 15 Apr 2025 17:46:40 GMT
