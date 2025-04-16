@@ -1,3 +1,14 @@
 
   Warning  Unhealthy  13m (x15 over 126m)   kubelet  Readiness probe failed: Get "https://10.233.104.65:3000/api/health": dial tcp 10.233.104.65:3000: connect: connection refused
   Warning  BackOff    4m35s (x45 over 14m)  kubelet  Back-off restarting failed container grafana in pod kstack-grafana-5fd4d6cfb7-65tgb_prometheus(599926f0-fc20-4f2c-82b5-51849eec5cdf)
+
+kubectl get pod <pod-name> -n <namespace> -o yaml | grep -A 10 "resources:"
+# OR
+kubectl get pod <pod-name> -n <namespace> -o json | jq '.spec.containers[].resources'
+
+kubectl get pods -n <namespace> \
+  -o custom-columns="NAME:.metadata.name,CPU_REQUEST:.spec.containers[*].resources.requests.cpu,CPU_LIMIT:.spec.containers[*].resources.limits.cpu,MEMORY_REQUEST:.spec.containers[*].resources.requests.memory,MEMORY_LIMIT:.spec.containers[*].resources.limits.memory"
+
+
+kubectl describe node <node-name> | grep -A 10 "Allocated resources:"
+# Shows total resource usage across all pods on a node.
