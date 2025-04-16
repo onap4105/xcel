@@ -1,0 +1,11 @@
+Summary of the issue
+
+Prometheus/Grafana is deployed using the kube-prometheus-stack helm chart 
+
+Dashboard three queries
+A: sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{namespace="fluentbit", pod="fluent-bit-2l44k", cluster=""}) by (container)
+
+B: sum( kube_pod_container_resource_requests{job="kube-state-metrics", cluster="", namespace="fluentbit", pod="fluent-bit-2l44k", resource="cpu"})
+C:  sum( kube_pod_container_resource_limits{job="kube-state-metrics", cluster="", namespace="fluentbit", pod="fluent-bit-2l44k", resource="cpu"})
+
+B and C show on the dashboard, but A query does not show 
