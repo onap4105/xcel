@@ -1,0 +1,6 @@
+[error] [flb_kafka] cannot configure 'sasl.oauthbearer.client.id' property
+[error] [flb_kafka] cannot configure 'sasl.oauthbearer.client.secret' property
+[error] [flb_kafka] cannot configure 'sasl.oauthbearer.extensions' property
+[error] [flb_kafka] cannot configure 'sasl.oauthbearer.method' property
+[error] [flb_kafka] cannot configure 'sasl.oauthbearer.scope' property
+[error] [flb_kafka] cannot configure 'sasl.oauthbearer.token.endpoint.url' property
