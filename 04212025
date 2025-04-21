@@ -1,0 +1,5 @@
+Events:
+  Type     Reason     Age                        From     Message
+  ----     ------     ----                       ----     -------
+  Warning  BackOff    6m33s (x14369 over 2d19h)  kubelet  Back-off restarting failed container node-driver-registrar in pod csidriver-secrets-store-csi-driver-khqhr_csidriver(f873a39f-53d6-4e8f-913b-6f9d020f88d8)
+  Warning  Unhealthy  66s (x3532 over 2d19h)     kubelet  (combined from similar events): Liveness probe failed: F0421 15:39:36.560975      16 main.go:160] Kubelet plugin registration hasn't succeeded yet, file=/opt/app/kubelet/plugins/csi-secrets-store/registration doesn't exist.
