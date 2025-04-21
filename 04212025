@@ -3,3 +3,19 @@ Events:
   ----     ------     ----                       ----     -------
   Warning  BackOff    6m33s (x14369 over 2d19h)  kubelet  Back-off restarting failed container node-driver-registrar in pod csidriver-secrets-store-csi-driver-khqhr_csidriver(f873a39f-53d6-4e8f-913b-6f9d020f88d8)
   Warning  Unhealthy  66s (x3532 over 2d19h)     kubelet  (combined from similar events): Liveness probe failed: F0421 15:39:36.560975      16 main.go:160] Kubelet plugin registration hasn't succeeded yet, file=/opt/app/kubelet/plugins/csi-secrets-store/registration doesn't exist.
+
+
+# kubectl logs -n csidriver csidriver-secrets-store-csi-driver-khqhr -c node-driver-registrar -f
+I0421 15:45:56.685732       1 main.go:167] Version: v2.7.0
+I0421 15:45:56.685781       1 main.go:168] Running node-driver-registrar in mode=registration
+I0421 15:45:56.686320       1 main.go:192] Attempting to open a gRPC connection with: "/csi/csi.sock"
+I0421 15:45:56.686347       1 connection.go:154] Connecting to unix:///csi/csi.sock
+I0421 15:45:56.687113       1 main.go:199] Calling CSI driver to discover driver name
+I0421 15:45:56.687134       1 connection.go:183] GRPC call: /csi.v1.Identity/GetPluginInfo
+I0421 15:45:56.687139       1 connection.go:184] GRPC request: {}
+I0421 15:45:56.690549       1 connection.go:186] GRPC response: {"name":"secrets-store.csi.k8s.io","vendor_version":"v1.3.3"}
+I0421 15:45:56.690633       1 connection.go:187] GRPC error: <nil>
+I0421 15:45:56.690643       1 main.go:209] CSI driver name: "secrets-store.csi.k8s.io"
+I0421 15:45:56.690689       1 node_register.go:53] Starting Registration Server at: /registration/secrets-store.csi.k8s.io-reg.sock
+I0421 15:45:56.690886       1 node_register.go:62] Registration Server started at: /registration/secrets-store.csi.k8s.io-reg.sock
+I0421 15:45:56.690960       1 node_register.go:92] Skipping HTTP server because endpoint is set to: ""
