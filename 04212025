@@ -19,3 +19,12 @@ I0421 15:45:56.690643       1 main.go:209] CSI driver name: "secrets-store.csi.k
 I0421 15:45:56.690689       1 node_register.go:53] Starting Registration Server at: /registration/secrets-store.csi.k8s.io-reg.sock
 I0421 15:45:56.690886       1 node_register.go:62] Registration Server started at: /registration/secrets-store.csi.k8s.io-reg.sock
 I0421 15:45:56.690960       1 node_register.go:92] Skipping HTTP server because endpoint is set to: ""
+
+
+Events:
+  Type     Reason            Age                  From               Message
+  ----     ------            ----                 ----               -------
+  Warning  FailedScheduling  56m                  default-scheduler  0/7 nodes are available: pod has unbound immediate PersistentVolumeClaims. preemption: 0/7 nodes are available: 7 Preemption is not helpful for scheduling.
+  Normal   Scheduled         56m                  default-scheduler  Successfully assigned ndcu-vault/ndcu-vault-0 to nasdcu4ncw04
+  Warning  FailedMount       102s (x35 over 56m)  kubelet            MountVolume.MountDevice failed for volume "pvc-ade4c36a-c2fb-45a6-aab2-8e552064a44c" : kubernetes.io/csi: attacher.MountDevice failed to create newCsiDriverClient: driver name cstor.csi.openebs.io not found in the list of registered CSI drivers
+
