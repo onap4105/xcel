@@ -1,0 +1,1 @@
+I do not understand why grafana returns two numbers(fluentbit and sum())  from the query sum(irate(container_cpu_usage_seconds_total{namespace="fluentbit", pod="fluent-bit-8b2sx"}[5m])) by (container)
