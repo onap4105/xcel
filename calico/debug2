@@ -1,0 +1,5 @@
+# kubectl version
+Client Version: v1.31.4
+Kustomize Version: v5.4.2
+Server Version: v1.28.6
+WARNING: version difference between client (1.31) and server (1.28) exceeds the supported minor version skew of +/-1
