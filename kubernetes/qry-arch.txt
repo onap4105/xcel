@@ -1,0 +1,11 @@
+Creation of K8s cluster using Azure DevOps pipelines
+open-ebs for persistent volume
+hashicorp vault for keys and secret management
+csidriver  for secret access within containers
+OIDC based authentication and Kubernetes RBAC
+Ingress controller for routing external client request to internal Kubernetes microservices
+Haproxy  for TLS termination and load balancer
+Kube-vip to manage virtual IP-address and UDP connection
+Fluent bit and elastic search OSS for logging and alerting
+Integration with Azure if any applications want to use Azure based PaaS or SaaS services
+Prometheus and Grafana  for telemetry and observability
