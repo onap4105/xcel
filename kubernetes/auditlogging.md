@@ -109,7 +109,7 @@ To enable Kubernetes audit logging and configure threat detection, follow these 
 
 By following these steps, you’ll enable comprehensive audit logging and threat detection tailored to US compliance needs.
 
-### ** --------------- kubespray configuration ------------------ **
+### **kubespray configuration**
 
 Yes, **Kubespray** (the popular open-source tool for deploying production-ready Kubernetes clusters) supports configuring Kubernetes audit logging out of the box, and you can extend it to integrate threat detection tools like Falco. Below is a breakdown of how to achieve this with the latest Kubespray version (as of 2023):
 
