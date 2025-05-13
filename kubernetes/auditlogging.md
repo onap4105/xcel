@@ -241,3 +241,99 @@ After deployment:
 - Use `kubectl describe pod kube-apiserver-<node>` for error details.
 
 By following these steps, Kubespray can fully support Kubernetes audit logging and be extended for threat detection. For managed clusters (EKS/GKE/AKS), use cloud-native audit logging instead.
+
+
+Let’s compare the two audit policies to determine which is more effective for different use cases:
+
+---
+
+### **Policy 1 (Original)**
+```yaml
+apiVersion: audit.k8s.io/v1
+kind: Policy
+rules:
+  - level: Metadata
+    omitStages: ["RequestReceived"]
+  - level: RequestResponse
+    resources:
+      - group: ""
+        resources: ["secrets", "configmaps"]
+    users: ["system:serviceaccount:kube-system:anonymous"]
+```
+
+### **Policy 2 (Your Example)**
+```yaml
+apiVersion: audit.k8s.io/v1
+kind: Policy
+rules:
+  - level: Metadata
+    verbs: ["create", "update", "patch", "delete"]
+  - level: RequestResponse
+    resources:
+      - group: ""
+        resources: ["pods", "deployments"]
+```
+
+---
+
+### **Comparison**
+
+| **Criteria**                | **Policy 1**                                                                 | **Policy 2**                                                                 |
+|-----------------------------|------------------------------------------------------------------------------|------------------------------------------------------------------------------|
+| **Focus**                   | Security-focused (sensitive resources + high-risk user).                     | Operational-focused (tracking workload changes).                             |
+| **Verbosity**               | Lower: `Metadata` for general requests, `RequestResponse` only for secrets.  | Higher: `RequestResponse` for pods/deployments (may log large volumes).      |
+| **Security Value**          | Higher: Targets `secrets/configmaps` and a risky service account (`anonymous`). | Lower: Focuses on workload resources (less sensitive unless misconfigured). |
+| **Operational Value**       | Lower: Minimal logging for non-sensitive operations.                         | Higher: Tracks mutations (`create`, `update`, `delete`) for debugging.      |
+| **Compliance**              | Better for compliance (e.g., PCI-DSS, HIPAA) due to secrets/configmaps.      | Less aligned with compliance unless pods/deployments handle sensitive data. |
+| **Log Volume**              | Controlled: `RequestResponse` limited to secrets/configmaps.                 | Potentially large: `RequestResponse` for pods/deployments.                  |
+| **User Targeting**          | Specific: Only logs `RequestResponse` for the `anonymous` service account.   | Broad: Applies to all users interacting with pods/deployments.               |
+| **Stage Filtering**          | Omits `RequestReceived` to reduce noise.                                     | No stage filtering (logs all stages).                                        |
+
+---
+
+### **Which Policy Makes More Sense?**
+#### **Choose Policy 1 if**:
+- You prioritize **security and compliance** (e.g., protecting secrets/configmaps).
+- You want to monitor high-risk actors like the `anonymous` service account.
+- You need to minimize log volume while capturing critical security events.
+
+#### **Choose Policy 2 if**:
+- You need to **audit cluster operations** (e.g., pod/deployment changes for debugging).
+- Your workloads (pods/deployments) handle sensitive data (e.g., financial transactions).
+- Log volume is not a concern, and you need full visibility into workload activity.
+
+---
+
+### **Key Recommendations**
+1. **Hybrid Approach**:
+   Combine both policies for a balanced strategy:
+   - Use `RequestResponse` for secrets/configmaps (Policy 1).
+   - Use `Metadata` for mutating verbs (Policy 2) to track changes.
+   ```yaml
+   apiVersion: audit.k8s.io/v1
+   kind: Policy
+   rules:
+     - level: Metadata
+       verbs: ["create", "update", "patch", "delete"]
+     - level: RequestResponse
+       resources:
+         - group: ""
+           resources: ["secrets", "configmaps"]
+       users: ["system:serviceaccount:kube-system:anonymous"]
+   ```
+
+2. **Best Practices**:
+   - Avoid `RequestResponse` for non-sensitive resources (e.g., pods) unless required.
+   - Use `omitStages: ["RequestReceived"]` to reduce noise (Policy 1).
+   - Restrict `RequestResponse` to critical resources and users (e.g., `secrets`, `admin` users).
+
+3. **Compliance Alignment**:
+   - Policy 1 aligns with standards like PCI-DSS (secret access logging).
+   - Policy 2 may require justification if pods/deployments don’t handle sensitive data.
+
+---
+
+### **Final Verdict**
+- **Policy 1 is better for security/compliance**.
+- **Policy 2 is better for operational auditing**.
+- **Combine both** if you need both security and operational visibility.
