@@ -1,1 +1,28 @@
 https://github.com/dnplus/streamlit-oauth/issues/77
+
+httpx_oauth.oauth2.GetAccessTokenError: Client error '400 Bad Request' for url 'https://login.microsoftonline.com/e741d71c-c6b6-47b0-803c-0f3b32b07556/oauth2/v2.0/token' For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400
+File "c:\Users\hg4105\myworkspace\streamlit\.venv\Lib\site-packages\streamlit\runtime\scriptrunner\exec_code.py", line 121, in exec_func_with_error_handling
+    result = func()
+             ^^^^^^
+File "c:\Users\hg4105\myworkspace\streamlit\.venv\Lib\site-packages\streamlit\runtime\scriptrunner\script_runner.py", line 591, in code_to_exec
+    exec(code, module.__dict__)
+File "C:\Users\hg4105\myworkspace\streamlit\app.py", line 29, in <module>
+    result = oauth2.authorize_button("Authorize", REDIRECT_URI, SCOPE)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "c:\Users\hg4105\myworkspace\streamlit\.venv\Lib\site-packages\streamlit_oauth\__init__.py", line 122, in authorize_button
+    result['token'] = asyncio.run(self.client.get_access_token(**args))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\runners.py", line 195, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\base_events.py", line 691, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+File "c:\Users\hg4105\myworkspace\streamlit\.venv\Lib\site-packages\httpx_oauth\oauth2.py", line 316, in get_access_token
+    response = await self.send_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+File "c:\Users\hg4105\myworkspace\streamlit\.venv\Lib\site-packages\httpx_oauth\oauth2.py", line 475, in send_request
+    raise exc_class(str(e), e.response) from e
