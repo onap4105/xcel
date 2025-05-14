@@ -1,0 +1,9 @@
+ kubectl logs -n falco falco-6hv5r -c falcoctl-artifact-install
+{"level":"INFO","msg":"Resolving dependencies ...","timestamp":"2025-05-14 15:10:03"}
+{"level":"INFO","msg":"Installing artifacts","refs":["ghcr.io/falcosecurity/rules/falco-rules:3"],"timestamp":"2025-05-14 15:10:06"}
+{"level":"INFO","msg":"Preparing to pull artifact","ref":"ghcr.io/falcosecurity/rules/falco-rules:3","timestamp":"2025-05-14 15:10:06"}
+{"level":"INFO","msg":"Pulling layer 8da*********","timestamp":"2025-05-14 15:10:12"}
+{"level":"INFO","msg":"Pulling layer b3990bf0209c","timestamp":"2025-05-14 15:10:13"}
+{"level":"INFO","msg":"Pulling layer de2cd036fd7f","timestamp":"2025-05-14 15:10:13"}
+{"digest":"ghcr.io/falcosecurity/rules/falco-rules@sha256:de2cd036fd7f9bb87de5d62b36d0f35ff4fa8afbeb9a41aa9624e5f6f9a004e1","level":"INFO","msg":"Verifying signature for artifact","timestamp":"2025-05-14 15:10:13"}
+{"level":"ERROR","msg":"error while verifying signature for ghcr.io/falcosecurity/rules/falco-rules@sha256:de2cd036fd7f9bb87de5d62b36d0f35ff4fa8afbeb9a41aa9624e5f6f9a004e1: getting Rekor public keys: updating local metadata and targets: error updating to TUF remote mirror: tuf: failed to download 10.root.json: Get \"https://tuf-repo-cdn.sigstore.dev/10.root.json\": net/http: TLS handshake timeout","timestamp":"2025-05-14 15:10:23"}
