@@ -23,3 +23,29 @@ oauth2 = OAuth2Component(
         "redirect_uri": REDIRECT_URI
     }
 )
+
+# For streamlit-oauth==0.3.0 or compatible
+oauth2 = OAuth2Component(
+    client_id=CLIENT_ID,
+    client_secret=CLIENT_SECRET,
+    authorize_endpoint=AUTHORIZE_URL,  # Parameter name changed
+    token_endpoint=TOKEN_URL,          # Parameter name changed
+    refresh_token_endpoint=REFRESH_TOKEN_URL or None,
+    revoke_token_endpoint=REVOKE_TOKEN_URL or None,
+    client_kwargs={
+        "scope": SCOPE,
+        "redirect_uri": REDIRECT_URI
+    }
+)
+
+# If using older streamlit-oauth (<0.3.0), use this instead:
+# oauth2 = OAuth2Component(
+#     CLIENT_ID,
+#     CLIENT_SECRET,
+#     AUTHORIZE_URL,
+#     TOKEN_URL,
+#     refresh_token_url=REFRESH_TOKEN_URL,
+#     revoke_token_url=REVOKE_TOKEN_URL,
+#     scope=SCOPE,
+#     redirect_uri=REDIRECT_URI
+# )
