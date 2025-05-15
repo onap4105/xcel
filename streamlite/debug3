@@ -8,3 +8,18 @@ File "c:\Users\hg4105\myworkspace\streamlit\.venv\Lib\site-packages\streamlit\ru
 File "C:\Users\hg4105\myworkspace\streamlit\app.py", line 54, in <module>
     oauth2 = OAuth2Component(
              ^^^^^^^^^^^^^^^^
+
+
+oauth2 = OAuth2Component(
+    client_id=CLIENT_ID,
+    client_secret=CLIENT_SECRET,
+    authorize_endpoint=AUTHORIZE_URL,  # Changed from authorize_url
+    token_endpoint=TOKEN_URL,          # Changed from token_url
+    refresh_token_endpoint=REFRESH_TOKEN_URL,  # Changed from refresh_token_url
+    revoke_token_endpoint=REVOKE_TOKEN_URL,    # Changed from revoke_token_url
+    # Some versions might require these additional parameters:
+    client_kwargs={
+        "scope": SCOPE,
+        "redirect_uri": REDIRECT_URI
+    }
+)
