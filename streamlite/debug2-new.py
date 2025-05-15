@@ -79,3 +79,22 @@ else:
             st.rerun()
         except Exception as e:
             st.error(f"Token refresh failed: {str(e)}")
+
+# Verify .env file path
+from pathlib import Path
+
+# Debug current working directory
+st.write("## Debugging .env file path")
+st.write(f"Current working directory: `{Path.cwd()}`")
+
+env_path = Path('.') / '.env'
+st.write(f"Looking for .env at: `{env_path.resolve()}`")
+
+if not env_path.exists():
+    st.error(f".env file not found at: `{env_path.absolute()`}")
+    st.write("Directory contents:")
+    for f in Path('.').iterdir():
+        st.write(f"- `{f}`")
+    st.stop()
+else:
+    st.success(f"Found .env file at: `{env_path.resolve()}`")
