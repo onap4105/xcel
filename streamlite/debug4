@@ -1,0 +1,97 @@
+getting below error with th escript below
+You can now view your Streamlit app in your browser.
+
+  Local URL: http://localhost:8501
+  Network URL: http://135.91.250.207:8501
+
+DEBUG:asyncio:Using selector: SelectSelector
+2025-05-15 08:13:47.740 ComponentRequestHandler: GET C:\Users\hg4105\myworkspace\streamlit\.venv\Lib\site-packages\streamlit_oauth\frontend\dist\https\x3a\login.microsoftonline.com\e741d71c-c6b6-47b0-803c-0f3b32b07556\oauth2\v2.0\authorize read error
+Traceback (most recent call last):
+  File "c:\Users\hg4105\myworkspace\streamlit\.venv\Lib\site-packages\streamlit\web\server\component_request_handler.py", line 56, in get
+    with open(abspath, "rb") as file:
+         ^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\hg4105\\myworkspace\\streamlit\\.venv\\Lib\\site-packages\\streamlit_oauth\\frontend\\dist\\https\\x3a\\login.microsoftonline.com\\e741d71c-c6b6-47b0-803c-0f3b32b07556\\oauth2\\v2.0\\authorize'
+
+below is the script 
+import streamlit as st
+from streamlit_oauth import OAuth2Component
+import os
+import logging
+from pathlib import Path
+from dotenv import load_dotenv
+
+# Configure logging
+logging.basicConfig(level=logging.DEBUG)
+
+# --- Environment Variables Loading ---
+# Debug current working directory
+st.write("## Debugging .env file path")
+st.write(f"Current working directory: `{Path.cwd()}`")
+
+# Verify .env file path
+env_path = Path('.') / '.env'
+st.write(f"Looking for .env at: `{env_path.resolve()}`")
+if not env_path.exists():
+    st.error(f".env file not found at: {env_path.absolute()}")
+    st.stop()
+
+# Load environment variables
+load_dotenv(dotenv_path=env_path)
+
+# Get environment variables with validation
+def get_env_var(name):
+    value = os.getenv(name)
+    if not value:
+        st.error(f"Missing required environment variable: {name}")
+        st.stop()
+    return value
+
+AUTHORIZE_URL = get_env_var('AUTHORIZE_URL')
+TOKEN_URL = get_env_var('TOKEN_URL')
+REFRESH_TOKEN_URL = get_env_var('REFRESH_TOKEN_URL') if os.getenv('REFRESH_TOKEN_URL') else None
+REVOKE_TOKEN_URL = get_env_var('REVOKE_TOKEN_URL') if os.getenv('REVOKE_TOKEN_URL') else None
+CLIENT_ID = get_env_var('CLIENT_ID')
+CLIENT_SECRET = get_env_var('CLIENT_SECRET')
+REDIRECT_URI = get_env_var('REDIRECT_URI')
+SCOPE = get_env_var('SCOPE')
+
+# Debug print environment variables (remove in production)
+st.write("Loaded environment variables:")
+st.json({
+    "AUTHORIZE_URL": AUTHORIZE_URL,
+    "TOKEN_URL": TOKEN_URL,
+    "CLIENT_ID": CLIENT_ID,
+    "REDIRECT_URI": REDIRECT_URI,
+    "SCOPE": SCOPE
+})
+
+# --- OAuth Configuration ---
+oauth2 = OAuth2Component(
+    CLIENT_ID, CLIENT_SECRET, AUTHORIZE_URL, TOKEN_URL,
+    REFRESH_TOKEN_URL, REVOKE_TOKEN_URL
+)
+
+# --- Authentication Flow ---
+if 'token' not in st.session_state:
+    result = oauth2.authorize_button(
+        name="Authorize",
+        redirect_uri=REDIRECT_URI,
+        scope=SCOPE,
+        key="authorize"
+    )
+    
+    if result and 'token' in result:
+        st.session_state.token = result['token']
+        st.rerun()
+else:
+    token = st.session_state.token
+    st.subheader("Current Token:")
+    st.json(token)
+    
+    if st.button("Refresh Token"):
+        try:
+            new_token = oauth2.refresh_token(token)
+            st.session_state.token = new_token
+            st.rerun()
+        except Exception as e:
+            st.error(f"Token refresh failed: {str(e)}")
