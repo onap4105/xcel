@@ -1,0 +1,32 @@
+
+--
+
+# Kubernetes dashboard
+# RBAC required. see docs/getting-started.md for access details.
+dashboard_enabled: true
+
+# Helm deployment
+helm_enabled: true
+
+# Registry deployment
+registry_enabled: false
+# registry_namespace: kube-system
+# registry_storage_class: ""
+# registry_disk_size: "10Gi"
+
+# Metrics Server deployment
+metrics_server_enabled: true
+
+
+Unexpected scalar token in YAML stream: "dashboard_enabled" at line 6, column 1
+Unexpected map-value-ind token in YAML stream: ":" at line 6, column 18
+Unexpected scalar token in YAML stream: "true" at line 6, column 20
+Unexpected scalar token in YAML stream: "helm_enabled" at line 9, column 1
+Unexpected map-value-ind token in YAML stream: ":" at line 9, column 13
+Unexpected scalar token in YAML stream: "true" at line 9, column 15
+Unexpected scalar token in YAML stream: "registry_enabled" at line 12, column 1
+Unexpected map-value-ind token in YAML stream: ":" at line 12, column 17
+Unexpected scalar token in YAML stream: "false" at line 12, column 19
+Unexpected scalar token in YAML stream: "metrics_server_enabled" at line 18, column 1
+Unexpected map-value-ind token in YAML stream: ":" at line 18, column 23
+Unexpected scalar token in YAML stream: "true" at line 18, column 25
