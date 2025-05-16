@@ -1,0 +1,29 @@
+I have kubernetes v1.31.4 installed using kubespray 2.27.0, and the cluster is up runnning, all are good, now I want to hardening by adding the kubernetes audit log, 
+i added below configurations in kubespray/inventory/mycluster/group_vars/k8s_cluster/k8s-cluster.yml,
+# audit log for kubernetes
+kubernetes_audit: true
+audit_log_path: "/opt/app/audit/kube-apiserver-log.json"
+audit_log_maxage: 5
+audit_log_maxbackups: 5
+audit_log_maxsize: 100
+
+and run these ansible-playbook step for the upgrade 
+ansible-playbook playbooks/facts.yml -b -i inventory/sample/hosts.ini
+ansible-playbook upgrade-cluster.yml -b -i inventory/sample/hosts.ini --limit "kube_control_plane"
+
+I see /etc/kubernetes/audit-policy/apiserver-audit-policy.yaml was created , but I do not see /etc/kubernetes/manifests/kube-apiserver.yaml was updated, and kube-apiserver was not restarted, I do not see audit logs.
+
+I found audit related logics in below files, does the upgrade supports this reconfiguration?  what is th eright approach?
+
+roles/kubernetes/control-plane/defaults/main/main.yml:audit_log_path: /var/log/audit/kube-apiserver-audit.log
+roles/kubernetes/control-plane/defaults/main/main.yml:audit_log_mountpath: "{{ audit_log_path | dirname }}"
+
+roles/kubernetes/control-plane/templates/kubeadm-config.v1beta3.yaml.j2:    audit-log-path: "{{ audit_log_path }}"
+roles/kubernetes/control-plane/templates/kubeadm-config.v1beta3.yaml.j2:{% if audit_log_path != "-" %}
+roles/kubernetes/control-plane/templates/kubeadm-config.v1beta4.yaml.j2:    value: "{{ audit_log_path }}"
+roles/kubernetes/control-plane/templates/kubeadm-config.v1beta4.yaml.j2:{% if audit_log_path != "-" %}
+
+tests/files/packet_ubuntu20-calico-all-in-one-hardening.yml:audit_log_path: "/var/log/kube-apiserver-log.json"
+
+roles/kubernetes/control-plane/defaults/main/main.yml
+roles/kubernetes/control-plane/templates/kubeadm-config.v1beta3.yaml.j2
