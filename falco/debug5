@@ -1,0 +1,12 @@
+Defaulted container "falco" out of: falco, falcoctl-artifact-follow, falcoctl-artifact-install (init)
+
+
+hg4105@nasdcu4ncm04:~$ kubectl logs -n falco pod/falco-6d4564ff55-7sgp4 -c falcoctl-artifact-install
+{"level":"INFO","msg":"Resolving dependencies ...","timestamp":"2025-05-19 16:53:03"}
+{"level":"INFO","msg":"Installing artifacts","refs":["ghcr.io/falcosecurity/plugins/ruleset/k8saudit:0.11","ghcr.io/falcosecurity/plugins/plugin/k8saudit:0.11","json:0.7.0"],"timestamp":"2025-05-19 16:53:05"}
+{"level":"INFO","msg":"Preparing to pull artifact","ref":"ghcr.io/falcosecurity/plugins/ruleset/k8saudit:0.11","timestamp":"2025-05-19 16:53:05"}
+
+"ghcr.io/falcosecurity/plugins/ruleset/k8saudit:0.11",
+"ghcr.io/falcosecurity/plugins/plugin/k8saudit:0.11",
+"json:0.7.0"
+
