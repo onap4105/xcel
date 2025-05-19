@@ -1,0 +1,38 @@
+$ kubectl logs -n falco pod/falco-6d4564ff55-t5bw9 -c falcoctl-artifact-install
+{"level":"INFO","msg":"Resolving dependencies ...","timestamp":"2025-05-19 17:35:17"}
+{"level":"ERROR","msg":"unable to get manifest: unable to fetch reference \"jfrog-falco/k8saudit-rules:0.11\": Get \"https://jfrog-falco/v2/k8saudit-rules/manifests/0.11\": dial tcp: lookup jfrog-falco on 169.254.25.10:53: no such host","timestamp":"2025-05-19 17:35:17"}
+
+
+falcoctl:
+  artifact:
+    install:
+      # -- Enable the init container.
+      enabled: true
+    follow:
+      # -- Enable the sidecar container.
+      enabled: true
+  config:
+    artifact:
+      allowedRepos: ["artifact.it.att.com/apm0012178-dkr-mcom-group"]
+      repos:
+        - name: "jfrog-falco"
+          url: "artifact.it.att.com/apm0012178-dkr-mcom-group"  # Your actual URL
+          # --- Add credentials here ---
+          oci:
+            plainHTTP: false  # Keep as false for HTTPS
+            auth:
+              basic:
+                user: "xxxxxx"  # Artifactory username
+                password: "xxxxxxxx"  # Encrypted password
+
+      install:
+        # -- List of artifacts to be installed by the falcoctl init container.
+        #refs: [k8saudit-rules:0.11, k8saudit:0.11]
+        refs:
+          - "jfrog-falco/k8saudit-rules:0.11"
+          - "jfrog-falco/k8saudit:0.11"
+      follow:
+        # -- List of artifacts to be followed by the falcoctl sidecar container.
+        #refs: [k8saudit-rules:0.11]
+        refs:
+          - "jfrog-falco/k8saudit-rules:0.11"
