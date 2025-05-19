@@ -1,0 +1,153 @@
+$ kubectl describe pod -n falco
+Name:             falco-6d4564ff55-7bwtq
+Namespace:        falco
+Priority:         0
+Service Account:  falco
+Node:             nasdcu4ncw05/135.21.180.111
+Start Time:       Mon, 19 May 2025 19:49:35 +0000
+Labels:           app.kubernetes.io/instance=falco
+                  app.kubernetes.io/name=falco
+                  pod-template-hash=6d4564ff55
+Annotations:      checksum/certs: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+                  checksum/config: 42f4e9577b936bb77627ddee9f2541a07cd1df4353d631b367601466b373649b
+                  checksum/rules: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+                  cni.projectcalico.org/containerID: fafd862c6cfdaf10d23ac15e129d344d31aafde805af497ee20e4512e45da28b
+                  cni.projectcalico.org/podIP: 10.233.104.70/32
+                  cni.projectcalico.org/podIPs: 10.233.104.70/32
+Status:           Pending
+IP:               10.233.104.70
+IPs:
+  IP:           10.233.104.70
+Controlled By:  ReplicaSet/falco-6d4564ff55
+Init Containers:
+  falcoctl-artifact-install:
+    Container ID:  containerd://8a2ce7d61af3034c27aa7d556a5b4175806d7840f87920b1f604214fab290b5f
+    Image:         artifact.it.att.com/apm0012178-dkr-mcom-group/falcosecurity/falcoctl:0.11.0
+    Image ID:      artifact.it.att.com/apm0012178-dkr-mcom-group/falcosecurity/falcoctl@sha256:4b590b9c49a881a55f6c3121c235057951418d726a9c43c4e1dbe3a5fcf358d3
+    Port:          <none>
+    Host Port:     <none>
+    Args:
+      artifact
+      install
+      --log-format=json
+    State:          Waiting
+      Reason:       CrashLoopBackOff
+    Last State:     Terminated
+      Reason:       Error
+      Exit Code:    1
+      Started:      Mon, 19 May 2025 19:49:53 +0000
+      Finished:     Mon, 19 May 2025 19:49:54 +0000
+    Ready:          False
+    Restart Count:  2
+    Environment:    <none>
+    Mounts:
+      /etc/falcoctl from falcoctl-config-volume (rw)
+      /plugins from plugins-install-dir (rw)
+      /rulesfiles from rulesfiles-install-dir (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-srq6s (ro)
+Containers:
+  falco:
+    Container ID:
+    Image:         artifact.it.att.com/apm0012178-dkr-mcom-group/falcosecurity/falco:0.40.0-debian
+    Image ID:
+    Port:          8765/TCP
+    Host Port:     0/TCP
+    Args:
+      /usr/bin/falco
+      --disable-source
+      syscall
+    State:          Waiting
+      Reason:       PodInitializing
+    Ready:          False
+    Restart Count:  0
+    Limits:
+      cpu:     1
+      memory:  1Gi
+    Requests:
+      cpu:      100m
+      memory:   512Mi
+    Liveness:   http-get http://:8765/healthz delay=60s timeout=5s period=15s #success=1 #failure=3
+    Readiness:  http-get http://:8765/healthz delay=30s timeout=5s period=15s #success=1 #failure=3
+    Environment:
+      HOST_ROOT:            /host
+      FALCO_HOSTNAME:        (v1:spec.nodeName)
+      FALCO_K8S_NODE_NAME:   (v1:spec.nodeName)
+    Mounts:
+      /etc/falco from rulesfiles-install-dir (rw)
+      /etc/falco/falco.yaml from falco-yaml (rw,path="falco.yaml")
+      /host/proc from proc-fs (rw)
+      /root/.falco from root-falco-fs (rw)
+      /usr/share/falco/plugins from plugins-install-dir (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-srq6s (ro)
+  falcoctl-artifact-follow:
+    Container ID:
+    Image:         artifact.it.att.com/apm0012178-dkr-mcom-group/falcosecurity/falcoctl:0.11.0
+    Image ID:
+    Port:          <none>
+    Host Port:     <none>
+    Args:
+      artifact
+      follow
+      --log-format=json
+    State:          Waiting
+      Reason:       PodInitializing
+    Ready:          False
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /etc/falcoctl from falcoctl-config-volume (rw)
+      /plugins from plugins-install-dir (rw)
+      /rulesfiles from rulesfiles-install-dir (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-srq6s (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True
+  Initialized                 False
+  Ready                       False
+  ContainersReady             False
+  PodScheduled                True
+Volumes:
+  plugins-install-dir:
+    Type:       EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:
+    SizeLimit:  <unset>
+  rulesfiles-install-dir:
+    Type:       EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:
+    SizeLimit:  <unset>
+  root-falco-fs:
+    Type:       EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:
+    SizeLimit:  <unset>
+  proc-fs:
+    Type:          HostPath (bare host directory volume)
+    Path:          /proc
+    HostPathType:
+  falcoctl-config-volume:
+    Type:      ConfigMap (a volume populated by a ConfigMap)
+    Name:      falco-falcoctl
+    Optional:  false
+  falco-yaml:
+    Type:      ConfigMap (a volume populated by a ConfigMap)
+    Name:      falco
+    Optional:  false
+  kube-api-access-srq6s:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    ConfigMapOptional:       <nil>
+    DownwardAPI:             true
+QoS Class:                   Burstable
+Node-Selectors:              <none>
+Tolerations:                 node-role.kubernetes.io/control-plane:NoSchedule
+                             node-role.kubernetes.io/master:NoSchedule
+                             node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type     Reason     Age                From               Message
+  ----     ------     ----               ----               -------
+  Normal   Scheduled  39s                default-scheduler  Successfully assigned falco/falco-6d4564ff55-7bwtq to nasdcu4ncw05
+  Normal   Pulled     22s (x3 over 39s)  kubelet            Container image "artifact.it.att.com/apm0012178-dkr-mcom-group/falcosecurity/falcoctl:0.11.0" already present on machine
+  Normal   Created    21s (x3 over 39s)  kubelet            Created container falcoctl-artifact-install
+  Normal   Started    21s (x3 over 39s)  kubelet            Started container falcoctl-artifact-install
+  Warning  BackOff    6s (x3 over 34s)   kubelet            Back-off restarting failed container falcoctl-artifact-install in pod falco-6d4564ff55-7bwtq_falco(fef54289-2fd6-455b-ade5-d51582018490)
