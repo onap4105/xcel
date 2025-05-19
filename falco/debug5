@@ -8,6 +8,7 @@ hg4105@nasdcu4ncm04:~$ kubectl logs -n falco pod/falco-6d4564ff55-7sgp4 -c falco
 
 "ghcr.io/falcosecurity/plugins/ruleset/k8saudit:0.11",
 "ghcr.io/falcosecurity/plugins/plugin/k8saudit:0.11",
+ghcr.io/falcosecurity/plugins/plugin/json:0.7.0
 "json:0.7.0"
 
 
