@@ -1,0 +1,3 @@
+$ kubectl logs -n falco pod/falco-6d4564ff55-mj5s5 -c falcoctl-artifact-install
+{"level":"INFO","msg":"Resolving dependencies ...","timestamp":"2025-05-19 17:22:03"}
+{"level":"ERROR","msg":"unable to get manifest: unable to fetch reference \"artifact.it.att.com/apm0012178-dkr-mcom-group/k8saudit-rules:0.11\": GET \"https://artifact.it.att.com/v2/apm0012178-dkr-mcom-group/k8saudit-rules/manifests/0.11\": GET \"https://artifact.it.att.com/artifactory/api/docker/apm0012178-dkr-mcom-group/v2/token?scope=repository%3Aapm0012178-dkr-mcom-group%2Fk8saudit-rules%3Apull\u0026scope=repository%3Ak8saudit-rules%3Apull\u0026service=artifact.it.att.com\": response status code 401: : Authentication is required","timestamp":"2025-05-19 17:22:04"}
