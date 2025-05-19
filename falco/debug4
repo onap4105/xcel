@@ -45,3 +45,8 @@ with this update, still seeing the error below
 $ kubectl logs -n falco pod/falco-6d4564ff55-8vchj -c falcoctl-artifact-install
 {"level":"INFO","msg":"Resolving dependencies ...","timestamp":"2025-05-19 17:41:07"}
 {"level":"ERROR","msg":"unable to get manifest: unable to fetch reference \"jfrog-falco/k8saudit-rules:0.11\": Get \"https://jfrog-falco/v2/k8saudit-rules/manifests/0.11\": dial tcp: lookup jfrog-falco on 169.254.25.10:53: no such host","timestamp":"2025-05-19 17:41:07"}
+
+$ kubectl logs -n falco pod/falco-6d4564ff55-xnbg8 -c falcoctl-artifact-install
+{"level":"INFO","msg":"Resolving dependencies ...","timestamp":"2025-05-19 17:49:36"}
+{"level":"ERROR","msg":"unable to get manifest: unable to fetch reference \"artifact.it.att.com/k8saudit-rules:0.11\": GET \"https://artifact.it.att.com/v2/k8saudit-rules/manifests/0.11\": basic credential not found","timestamp":"2025-05-19 17:49:36"}
+
