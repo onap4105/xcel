@@ -10,3 +10,26 @@ hg4105@nasdcu4ncm04:~$ kubectl logs -n falco pod/falco-6d4564ff55-7sgp4 -c falco
 "ghcr.io/falcosecurity/plugins/plugin/k8saudit:0.11",
 "json:0.7.0"
 
+
+# nerdctl pull artifact.it.att.com/apm0012178-dkr-mcom-group/k8saudit:0.11
+artifact.it.att.com/apm0012178-dkr-mcom-group/k8saudit:0.11: resolving      |--------------------------------------|
+elapsed: 18.5s                                               total:   0.0 B (0.0 B/s)
+INFO[0018] trying next host - response was http.StatusNotFound  host=artifact.it.att.com
+FATA[0018] failed to resolve reference "artifact.it.att.com/apm0012178-dkr-mcom-group/k8saudit:0.11": artifact.it.att.com/apm0012178-dkr-mcom-group/k8saudit:0.11: not found
+
+
+# nerdctl pull artifact.it.att.com/apm0012178-dkr-mcom-group/falcosecurity/plugins/plugin/k8saudit:0.11
+artifact.it.att.com/apm0012178-dkr-mcom-group/falcosecurity/plugins/plugin/k8saudit:0.11: resolving      |--------------------------------------|
+elapsed: 2.4 s                                                                            total:   0.0 B (0.0 B/s)
+WARN[0002] reference for unknown type: application/vnd.cncf.falco.plugin.config.v1+json  digest="sha256:959c597e72d58dffc335f9d3e0e1676f30ef902b919eca9200d2dd1caaaf7746" mediatype=application/vnd.cncf.falco.plugi                              n.config.v1+json size=103
+artifact.it.att.com/apm0012178-dkr-mcom-group/falcosecurity/plugins/plugin/k8saudit:0.11: resolving      |--------------------------------------|
+elapsed: 2.5 s                                                                            total:   0.0 B (0.0 B/s)
+artifact.it.att.com/apm0012178-dkr-mcom-group/falcosecurity/plugins/plugin/k8saudit:0.11: resolved       |++++++++++++++++++++++++++++++++++++++|
+index-sha256:f14bc501015ef0e339fc449a36e1bd4cef5f2030a2638acf03de6a10cf854a09:            done           |++++++++++++++++++++++++++++++++++++++|
+manifest-sha256:0bddb8acbd5fe718a469da7f0a4099780ef71629161803c814d44ec14f601e38:         done           |++++++++++++++++++++++++++++++++++++++|
+unknown-sha256:6cf06fbe060b6158d2b461325ece0a4934e44a909ceabd12ae84b89988d28110:          done           |++++++++++++++++++++++++++++++++++++++|
+unknown-sha256:959c597e72d58dffc335f9d3e0e1676f30ef902b919eca9200d2dd1caaaf7746:          done           |++++++++++++++++++++++++++++++++++++++|
+elapsed: 2.6 s                                                                            total:   0.0 B (0.0 B/s)
+FATA[0002] unknown media type "application/vnd.cncf.falco.plugin.config.v1+json"
+
+
