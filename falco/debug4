@@ -36,3 +36,12 @@ falcoctl:
         #refs: [k8saudit-rules:0.11]
         refs:
           - "jfrog-falco/k8saudit-rules:0.11"
+
+with this update, still seeing the error below
+        - name: "jfrog-falco"
+          url: "https://artifact.it.att.com/apm0012178-dkr-mcom-group"  # Your actual URL
+
+
+$ kubectl logs -n falco pod/falco-6d4564ff55-8vchj -c falcoctl-artifact-install
+{"level":"INFO","msg":"Resolving dependencies ...","timestamp":"2025-05-19 17:41:07"}
+{"level":"ERROR","msg":"unable to get manifest: unable to fetch reference \"jfrog-falco/k8saudit-rules:0.11\": Get \"https://jfrog-falco/v2/k8saudit-rules/manifests/0.11\": dial tcp: lookup jfrog-falco on 169.254.25.10:53: no such host","timestamp":"2025-05-19 17:41:07"}
