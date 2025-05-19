@@ -214,4 +214,140 @@ falco:
      -f values-k8saudit.yaml
    ```
 
-This configuration ensures all artifact operations go through your JFrog proxy while maintaining the Kubernetes audit-specific setup. The `falcoctl` component will now resolve artifacts using your private registry instead of public sources.
+This configuration ensures all artifact operations go through your JFrog proxy while maintaining the Kubernetes audit-specific setup. The `falcoctl` component willHere's the **complete firewall-compliant** `values-k8saudit.yaml` with JFrog proxy integration for both images *and* artifacts:
+
+```yaml
+# -- Disable unnecessary components for k8saudit mode
+driver:
+  enabled: false
+
+collectors:
+  enabled: false
+
+# -- Deployment configuration
+controller:
+  kind: deployment
+  deployment:
+    replicas: 1
+
+# -- JFrog-configured falcoctl setup
+falcoctl:
+  # Image configuration for falcoctl itself
+  image:
+    registry: jfrog.example.com/artifactory/falco-proxy  # JFrog registry URL
+    repository: falcosecurity/falcoctl
+    tag: 0.11.0
+    pullPolicy: IfNotPresent
+  
+  # Artifact management through JFrog
+  artifact:
+    install:
+      enabled: true
+    follow:
+      enabled: true
+  config:
+    artifact:
+      allowedRepos: ["jfrog.example.com/artifactory/falco-proxy"]
+      repos:
+        - name: "jfrog-falco"
+          url: "jfrog.example.com/artifactory/falco-proxy"
+      install:
+        refs:
+          - "jfrog-falco/k8saudit-rules:0.11"
+          - "jfrog-falco/k8saudit:0.11"
+      follow:
+        refs:
+          - "jfrog-falco/k8saudit-rules:0.11"
+
+# -- Authentication for JFrog
+imagePullSecrets:
+  - name: jfrog-pull-secret
+
+# -- Kubernetes audit webhook
+services:
+  - name: k8saudit-webhook
+    type: NodePort
+    ports:
+      - port: 9765
+        nodePort: 30007
+        protocol: TCP
+
+# -- Core Falco configuration
+falco:
+  # TLS configuration for JFrog (if using self-signed certs)
+  extraVolumes:
+    - name: jfrog-ca-cert
+      secret:
+        secretName: jfrog-ca-cert-secret  # Only needed for self-signed certs
+  extraVolumeMounts:
+    - name: jfrog-ca-cert
+      mountPath: /etc/ssl/certs/jfrog-ca.crt
+      subPath: jfrog-ca.crt
+  env:
+    - name: SSL_CERT_FILE
+      value: /etc/ssl/certs/jfrog-ca.crt  # Remove if not using self-signed certs
+
+  # Plugin and rules setup
+  rules_files:
+    - /etc/falco/k8s_audit_rules.yaml
+    - /etc/falco/rules.d
+  plugins:
+    - name: k8saudit
+      library_path: libk8saudit.so
+      init_config:
+        ""
+      open_params: "http://:9765/k8s-audit"
+    - name: json
+      library_path: libjson.so
+      init_config: ""
+  load_plugins: [k8saudit, json]
+```
+
+### Replacement Guide
+1. **JFrog Configuration**:
+   ```yaml
+   falcoctl:
+     image:
+       registry: jfrog.example.com/artifactory/falco-proxy → Your JFrog registry
+     config:
+       artifact:
+         allowedRepos: ["jfrog.example.com/artifactory/falco-proxy"] → Same URL
+   ```
+
+2. **Secrets**:
+   ```yaml
+   imagePullSecrets:
+     - name: jfrog-pull-secret → Your pull secret name
+   ```
+
+3. **TLS Configuration** (Optional):
+   - Remove `extraVolumes`, `extraVolumeMounts`, and `env` if not using self-signed certs
+
+### Verification Checklist
+1. Ensure these resources exist in JFrog:
+   ```bash
+   # Image
+   jfrog.example.com/artifactory/falco-proxy/falcosecurity/falcoctl:0.11.0
+
+   # Artifacts
+   jfrog.example.com/artifactory/falco-proxy/k8saudit-rules:0.11
+   jfrog.example.com/artifactory/falco-proxy/k8saudit:0.11
+   ```
+
+2. Validate network access:
+   ```bash
+   # From cluster nodes:
+   curl -vk https://jfrog.example.com/artifactory/falco-proxy/
+   ```
+
+3. Deploy with Helm:
+   ```bash
+   helm upgrade falco falcosecurity/falco \
+     --install \
+     --namespace falco \
+     -f values-k8saudit.yaml
+   ```
+
+This configuration ensures complete air-gapped operation through your JFrog proxy, handling both container images (falcoctl) and artifacts (plugins/rules). All components now explicitly reference your private registry instead of default public sources. now resolve artifacts using your private registry instead of public sources.
+
+
