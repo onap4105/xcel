@@ -198,3 +198,135 @@ Falcoctl version: v0.6.1
 ---
 
 Let me know if you want a script to fully automate the plugin pull + JFrog push steps once `falcoctl` is installed.
+
+
+Thank you for clarifying — if those artifacts (like `k8saudit.linux-x86_64.so`) are not available directly at the expected URLs, you're correct: **Falco's plugin artifacts are not served as static files via public URLs.** They are managed and pulled dynamically by `falcoctl` via the [Falco Artifact Hub](https://github.com/falcosecurity/plugins) and OCI registries.
+
+---
+
+### 🧩 Solution Overview
+
+To get Falco plugins (`k8saudit`, `json`) and rulesets (`k8saudit-rules`) **behind a firewall**, you will need to:
+
+1. **Use `falcoctl` on an internet-enabled machine to pull artifacts.**
+2. **Mirror them to your JFrog Artifactory (as an OCI registry).**
+3. **Configure `falcoctl` in your Kubernetes cluster to pull from your JFrog registry with credentials.**
+
+---
+
+## ✅ Step-by-Step Solution
+
+---
+
+### **1. Set up `falcoctl` on a networked machine**
+
+Install `falcoctl` ([https://github.com/falcosecurity/falcoctl/releases](https://github.com/falcosecurity/falcoctl/releases))
+
+```bash
+curl -sL https://github.com/falcosecurity/falcoctl/releases/download/v0.6.1/falcoctl-linux-amd64.tar.gz | tar xz
+sudo mv falcoctl /usr/local/bin
+```
+
+---
+
+### **2. Pull plugins and rules using `falcoctl`**
+
+You’ll use `falcoctl` to pull the artifacts locally:
+
+```bash
+falcoctl artifact pull k8saudit:0.11 --output-dir ./falco-artifacts
+falcoctl artifact pull k8saudit-rules:0.11 --output-dir ./falco-artifacts
+falcoctl artifact pull json:latest --output-dir ./falco-artifacts
+```
+
+This will pull the OCI layers and extract them into a local directory (`./falco-artifacts`) like so:
+
+```
+falco-artifacts/
+  k8saudit/
+    plugin.json
+    k8saudit.linux-x86_64.so
+  k8saudit-rules/
+    rules.yaml
+  json/
+    plugin.json
+    json.linux-x86_64.so
+```
+
+---
+
+### **3. Push them to your JFrog Artifactory (as OCI registry)**
+
+First, tag the plugin for your JFrog registry:
+
+```bash
+falcoctl registry login <your-jfrog-registry>
+falcoctl artifact push ./falco-artifacts/k8saudit --type plugin --version 0.11 --oci-url <your-jfrog-registry>/falco/plugins
+falcoctl artifact push ./falco-artifacts/k8saudit-rules --type rulesfile --version 0.11 --oci-url <your-jfrog-registry>/falco/rules
+falcoctl artifact push ./falco-artifacts/json --type plugin --version latest --oci-url <your-jfrog-registry>/falco/plugins
+```
+
+Now the artifacts are available **inside your JFrog repo**, not `download.falco.org`.
+
+---
+
+### **4. Update your `values-k8saudit.yaml` to use JFrog**
+
+Modify the `falcoctl.config` section to point to your private JFrog registry.
+
+```yaml
+falcoctl:
+  artifact:
+    install:
+      enabled: true
+    follow:
+      enabled: true
+  config:
+    indexes:
+      - name: jfrog
+        type: oci
+        url: https://<your-jfrog-registry>/falco
+        ref: plugins/index.yaml
+    artifact:
+      install:
+        refs: [k8saudit:0.11, k8saudit-rules:0.11, json:latest]
+      follow:
+        refs: [k8saudit-rules:0.11]
+```
+
+---
+
+### **5. Use Kubernetes `imagePullSecret` for auth**
+
+If JFrog requires authentication, create a secret:
+
+```bash
+kubectl create secret docker-registry jfrog-creds \
+  --docker-server=<your-jfrog-registry> \
+  --docker-username=<username> \
+  --docker-password=<password> \
+  --docker-email=<email>
+```
+
+Then attach it to the Falco deployment:
+
+```yaml
+imagePullSecrets:
+  - name: jfrog-creds
+```
+
+---
+
+### ✅ Summary
+
+You **can’t manually download** the plugin `.so` files from `falco.org` — they must be retrieved using `falcoctl`, and then mirrored to JFrog using `falcoctl artifact push`.
+
+This makes your Falco deployment self-contained and firewall-friendly.
+
+---
+
+Let me know if you want help with:
+
+* A working `falcoctl.yaml` config
+* OCI push setup for Artifactory
+* Dockerfile to bundle everything directly into a custom Falco image (as a fallback)
