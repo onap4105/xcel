@@ -134,3 +134,67 @@ falco:
 ---
 
 Let me know if you’d like help generating the custom Falco Dockerfile or Kubernetes manifests for mounting the plugins.
+
+
+You're absolutely right — the URL I referenced was illustrative but **outdated** or **invalid**. The Falco team **no longer hosts precompiled tarballs that way**. The correct and up-to-date way to get `falcoctl` is:
+
+---
+
+## ✅ How to Install `falcoctl` (Correct Method)
+
+### **Option 1: Install via `go install`**
+
+If you have Go installed:
+
+```bash
+go install github.com/falcosecurity/falcoctl/cmd/falcoctl@latest
+```
+
+> This places the `falcoctl` binary in your `$GOPATH/bin` (usually `$HOME/go/bin`). Add that to your `PATH`.
+
+---
+
+### **Option 2: Use the Official GitHub Release Page**
+
+1. Visit: [https://github.com/falcosecurity/falcoctl/releases](https://github.com/falcosecurity/falcoctl/releases)
+
+2. Download the latest version manually — look for a file named something like:
+
+```
+falcoctl_0.6.1_linux_amd64.tar.gz
+```
+
+Direct link to latest as of now (change version if newer available):
+
+```
+https://github.com/falcosecurity/falcoctl/releases/download/v0.6.1/falcoctl_0.6.1_linux_amd64.tar.gz
+```
+
+3. Extract and install:
+
+```bash
+wget https://github.com/falcosecurity/falcoctl/releases/download/v0.6.1/falcoctl_0.6.1_linux_amd64.tar.gz
+tar -xzf falcoctl_0.6.1_linux_amd64.tar.gz
+sudo mv falcoctl /usr/local/bin/
+falcoctl version
+```
+
+---
+
+## ✅ Check Installation
+
+After installation:
+
+```bash
+falcoctl version
+```
+
+Should return something like:
+
+```
+Falcoctl version: v0.6.1
+```
+
+---
+
+Let me know if you want a script to fully automate the plugin pull + JFrog push steps once `falcoctl` is installed.
