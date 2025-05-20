@@ -1,0 +1,7 @@
+$ kubectl logs -n falco pod/falco-547f88cc9-9fm6p
+Tue May 20 16:52:07 2025: Falco version: 0.40.0 (x86_64)
+Tue May 20 16:52:07 2025: Falco initialized with configuration files:
+Tue May 20 16:52:07 2025:    /etc/falco/falco.yaml | schema validation: ok
+Tue May 20 16:52:07 2025: System info: Linux version 5.15.0-122-generic (buildd@lcy02-amd64-034) (gcc (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0, GNU ld (GNU Binutils for Ubuntu) 2.38) #132-Ubuntu SMP Thu Aug 29 13:45:52 UTC 2024
+Tue May 20 16:52:07 2025: Loading plugin 'k8saudit' from file /usr/share/falco/plugins/libk8saudit.so
+Tue May 20 16:52:07 2025: Runtime error: cannot load plugin /usr/share/falco/plugins/libk8saudit.so: can't load plugin dynamic library: /usr/share/falco/plugins/libk8saudit.so: cannot open shared object file: No such file or directory. Exiting.
