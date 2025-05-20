@@ -330,3 +330,157 @@ Let me know if you want help with:
 * A working `falcoctl.yaml` config
 * OCI push setup for Artifactory
 * Dockerfile to bundle everything directly into a custom Falco image (as a fallback)
+
+
+You're absolutely right again — thank you for pointing it out.
+
+As of the latest versions of `falcoctl`, there is **no `falcoctl artifact pull` command**. The documentation around Falco plugins and OCI artifacts is still evolving, and much of it assumes usage inside the **Helm chart with automatic fetching at runtime** — which doesn't work for you behind a firewall.
+
+So here's the **correct and updated solution** for mirroring Falco plugins and rules to your JFrog Artifactory registry.
+
+---
+
+## ✅ Goal Recap
+
+You want to:
+
+* Deploy Falco with the `k8saudit` plugin in a firewalled Kubernetes cluster
+* Use JFrog to cache or host the Falco plugins and rule artifacts
+* Bypass dynamic downloads from `https://download.falco.org` at runtime
+
+---
+
+## 🔄 Updated Working Method (2024/2025)
+
+### ✅ 1. Clone the Falco plugins repo
+
+```bash
+git clone https://github.com/falcosecurity/plugins.git
+cd plugins
+```
+
+This repo contains:
+
+* The `k8saudit` plugin source
+* The `json` plugin
+* The `k8saudit_rules.yaml` ruleset
+
+---
+
+### ✅ 2. Manually Build Plugins
+
+Use Docker to build the `.so` files for the plugins.
+
+```bash
+cd plugins/plugins/k8saudit
+make
+```
+
+After a successful build, you will get:
+
+```text
+output/k8saudit.linux-x86_64.so
+```
+
+Repeat for `json`:
+
+```bash
+cd ../json
+make
+```
+
+Get:
+
+```text
+output/json.linux-x86_64.so
+```
+
+---
+
+### ✅ 3. Collect All Artifacts
+
+Now gather everything Falco needs:
+
+```bash
+mkdir falco-offline-artifacts
+cp ../k8saudit/output/k8saudit.linux-x86_64.so falco-offline-artifacts/
+cp ../json/output/json.linux-x86_64.so falco-offline-artifacts/
+cp ../../rules/k8s_audit_rules.yaml falco-offline-artifacts/
+```
+
+---
+
+### ✅ 4. Upload to JFrog or Package in Image
+
+#### Option A: Upload to JFrog
+
+You can now upload these three files to a JFrog generic repository, for example:
+
+```
+https://jfrog.example.com/artifactory/falco/plugins/k8saudit.linux-x86_64.so
+https://jfrog.example.com/artifactory/falco/plugins/json.linux-x86_64.so
+https://jfrog.example.com/artifactory/falco/rules/k8s_audit_rules.yaml
+```
+
+Mount them in Kubernetes as a volume or configure a custom image.
+
+#### Option B: Build a Custom Falco Image (recommended)
+
+Here’s a Dockerfile example:
+
+```Dockerfile
+FROM falcosecurity/falco:latest
+
+COPY k8saudit.linux-x86_64.so /usr/share/falco/plugins/libk8saudit.so
+COPY json.linux-x86_64.so /usr/share/falco/plugins/libjson.so
+COPY k8s_audit_rules.yaml /etc/falco/k8s_audit_rules.yaml
+```
+
+Build:
+
+```bash
+docker build -t myregistry/falco-custom:latest .
+docker push myregistry/falco-custom:latest
+```
+
+---
+
+### ✅ 5. Update `values-k8saudit.yaml`
+
+Set everything to avoid falcoctl dynamic downloads:
+
+```yaml
+falcoctl:
+  artifact:
+    install:
+      enabled: false
+    follow:
+      enabled: false
+
+falco:
+  rules_files:
+    - /etc/falco/k8s_audit_rules.yaml
+  plugins:
+    - name: k8saudit
+      library_path: /usr/share/falco/plugins/libk8saudit.so
+      init_config: ""
+      open_params: "http://:9765/k8s-audit"
+    - name: json
+      library_path: /usr/share/falco/plugins/libjson.so
+      init_config: ""
+  load_plugins: [k8saudit, json]
+```
+
+---
+
+## ✅ Final Outcome
+
+Now your Falco deployment:
+
+* Does **not** need internet access
+* Pulls everything from JFrog or your custom image
+* Is self-contained and reproducible
+
+---
+
+Would you like me to generate a `Dockerfile` and build script for automating this?
