@@ -1,0 +1,33 @@
+/etc/kubernetes/manifests/kube-apiserver.yaml
+- --audit-webhook-config-file=/etc/kubernetes/webhook-config.yaml
+    - --audit-webhook-batch-max-wait=10ms
+    - --audit-webhook-initial-backoff=10ms
+
+
+    - mountPath: /etc/kubernetes/webhook-config.yaml
+      name: webhook-config
+      readOnly: true
+
+
+  - hostPath:
+      path: /etc/kubernetes/webhook-config.yaml
+      type: File
+    name: webhook-config
+
+/etc/kubernetes/webhook-config.yaml
+apiVersion: v1
+kind: Config
+clusters:
+  - name: falco-webhook
+    cluster:
+      # use the in-cluster service DNS
+      server: http://<idns>:31007/k8s-audit
+      insecure-skip-tls-verify: true   # or provide caBundle
+users:
+  - name: falco-webhook
+contexts:
+  - context:
+      cluster: falco-webhook
+      user: falco-webhook
+    name: falco-webhook
+current-context: falco-webhook
