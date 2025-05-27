@@ -1,5 +1,5 @@
 /etc/kubernetes/manifests/kube-apiserver.yaml
-- --audit-webhook-config-file=/etc/kubernetes/webhook-config.yaml
+    - --audit-webhook-config-file=/etc/kubernetes/webhook-config.yaml
     - --audit-webhook-batch-max-wait=10ms
     - --audit-webhook-initial-backoff=10ms
 
