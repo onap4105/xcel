@@ -18,3 +18,16 @@ PORT      STATE SERVICE
 
 Nmap done: 1 IP address (1 host up) scanned in 0.21 seconds
 kubectl get clusterrolebindings -o json | jq -r '.items[] | select(.roleRef.name=="view") | .metadata.name'
+
+kubectl get clusterroles -o json | jq -r '
+  .items[]
+  | select(
+      .rules[]? 
+      | select(
+          (.apiGroups | index("")?) and
+          (.resources | index("services")?) and
+          ((.verbs | index("get")) or (.verbs | index("list")))
+        )
+    )
+  | .metadata.name
+' | sort -u
