@@ -1,0 +1,19 @@
+t$ kubectl exec -it port-scanner -n falco -- sh
+~ # netstat -tuln | awk '$4 ~ /30000|32767/ {print $4}'
+~ #
+~ #  netstat -tuln | awk '$4 ~ /30000|32767/ {print $4}'
+~ # ss -tuln | grep ':3'
+udp   UNCONN 0      0          127.0.0.1:323        0.0.0.0:*
+udp   UNCONN 0      0              [::1]:323           [::]:*
+tcp   LISTEN 0      4096               *:31682            *:*
+tcp   LISTEN 0      4096               *:32623            *:*
+~ # nmap -p 30000-32767 127.0.0.1
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-05-28 14:45 UTC
+Nmap scan report for localhost.localdomain (127.0.0.1)
+Host is up (0.000022s latency).
+Not shown: 2766 closed tcp ports (reset)
+PORT      STATE SERVICE
+31682/tcp open  unknown
+32623/tcp open  unknown
+
+Nmap done: 1 IP address (1 host up) scanned in 0.21 seconds
