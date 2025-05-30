@@ -1,3 +1,4 @@
+i copied the debug output below, please check if you see any issues
 TASK [Verify kube-apiserver line exists] ***************************************
 task path: /agent/_work/2/s/layer-dcukubernetes/ansible/kubespray/falco-patch-debug.yml:3
 ok: [nasdcu4ncm05] => {
