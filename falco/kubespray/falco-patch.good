@@ -1,0 +1,111 @@
+falco-patch.yml works with all files under ansible/kubespray as below, but it fails with ansible/kubespray/falco
+ansible/kubespray$ ls -l *falco*
+-rw-r----- 1 AzDevOps AzDevOps 1940 May 30 16:22 falco-patch.yml
+-rw-r----- 1 AzDevOps AzDevOps  113 May 30 15:57 falco_mount_block.yml.j2
+-rw-r----- 1 AzDevOps AzDevOps  116 May 30 15:47 falco_volume_block.yml.j2
+
+for ansible/kubespray/falco, I have below
+ansible/kubespray$ cat falco.yml
+---
+- name: patch manifests for falco
+  ansible.builtin.import_playbook: falco/falco-patch.yml
+
+ansible/kubespray$ ls -l ./falco
+total 12
+-rw-r----- 1 AzDevOps AzDevOps 1940 May 30 16:31 falco-patch.yml
+-rw-r----- 1 AzDevOps AzDevOps  113 May 30 16:13 falco_mount_block.yml.j2
+-rw-r----- 1 AzDevOps AzDevOps  116 May 30 16:13 falco_volume_block.yml.j2
+
+$ cat falco-patch.yml
+- hosts: kube_control_plane
+  tasks:
+    - name: Ensure Falco audit config directory exists
+      file:
+        path: /etc/kubernetes/falco
+        state: directory
+        mode: 0755
+
+    - name: Deploy Falco audit webhook config
+      copy:
+        content: |
+          apiVersion: v1
+          kind: Config
+          clusters:
+            - name: falco-webhook
+              cluster:
+                server: http://falco-webhook.kube-system.svc:31007/k8s-audit
+                insecure-skip-tls-verify: true
+          users:
+            - name: falco-webhook
+          contexts:
+            - context:
+                cluster: falco-webhook
+                user: falco-webhook
+              name: falco-webhook
+          current-context: falco-webhook
+        dest: /etc/kubernetes/falco/webhook-config.yaml
+        mode: 0644
+
+    - name: Insert Falco webhook config lines
+      lineinfile:
+        path: /etc/kubernetes/manifests/kube-apiserver.yaml
+        marker: "# {mark} FALCO AUDIT WEBHOOK FLAGS"
+        line: "{{ item }}"
+        insertafter: '^ {4}- kube-apiserver$'
+      loop:
+        - "    - --audit-webhook-batch-max-wait=10ms"
+        - "    - --audit-webhook-initial-backoff=10ms"
+        - "    - --audit-webhook-config-file=/etc/kubernetes/falco/webhook-config.yaml"
+
+    - name: Add Falco audit webhook volume
+      blockinfile:
+        path: /etc/kubernetes/manifests/kube-apiserver.yaml
+        marker: "# {mark} FALCO AUDIT VOLUME"
+        insertafter: '^  volumes:'
+        block: "{{ lookup('file', 'falco_volume_block.yml.j2') }}"
+
+    - name: Add Falco audit webhook volume mount
+      blockinfile:
+        path: /etc/kubernetes/manifests/kube-apiserver.yaml
+        marker: "# {mark} FALCO AUDIT VOLUME MOUNT"
+        insertafter: '^\s*volumeMounts:'
+        block: "{{ lookup('file', 'falco_mount_block.yml.j2') }}"
+
+    - name: Restart kubelet
+      systemd:
+        name: kubelet
+        state: restarted
+
+
+failed: [nasdcu4ncm06] (item=    - --audit-webhook-config-file=/etc/kubernetes/falco/webhook-config.yaml) => {
+    "ansible_loop_var": "item",
+    "changed": false,
+    "invocation": {
+        "module_args": {
+            "attributes": null,
+            "backrefs": false,
+            "backup": false,
+            "create": false,
+            "firstmatch": false,
+            "group": null,
+            "insertafter": "^ {4}- kube-apiserver$",
+            "insertbefore": null,
+            "line": "    - --audit-webhook-config-file=/etc/kubernetes/falco/webhook-config.yaml",
+            "marker": "# {mark} FALCO AUDIT WEBHOOK FLAGS",
+            "mode": null,
+            "owner": null,
+            "path": "/etc/kubernetes/manifests/kube-apiserver.yaml",
+            "regexp": null,
+            "search_string": null,
+            "selevel": null,
+            "serole": null,
+            "setype": null,
+            "seuser": null,
+            "state": "present",
+            "unsafe_writes": false,
+            "validate": null
+        }
+    },
+    "item": "    - --audit-webhook-config-file=/etc/kubernetes/falco/webhook-config.yaml",
+    "msg": "Unsupported parameters for (lineinfile) module: marker. Supported parameters include: attributes, backrefs, backup, create, firstmatch, group, insertafter, insertbefore, line, mode, owner, path, regexp, search_string, selevel, serole, setype, seuser, state, unsafe_writes, validate (attr, dest, destfile, name, regex, value)."
+}
