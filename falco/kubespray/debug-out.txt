@@ -1,4 +1,23 @@
-i copied the debug output below, please check if you see any issues
+
+this is debug task, and i copied the debug output below, please check if you see any issues, i have issue with indentation for inserted argument line
+- name: Verify kube-apiserver line exists
+  command: grep -n '^\s*-\s*kube-apiserver' /etc/kubernetes/manifests/kube-apiserver.yaml
+  register: grep_result
+  changed_when: false
+
+- name: Show grep results
+  debug:
+    var: grep_result.stdout
+
+- name: Check file indentation
+  command: cat -A /etc/kubernetes/manifests/kube-apiserver.yaml
+  register: file_content
+  changed_when: false
+
+- name: Display file with visible whitespace
+  debug:
+    var: file_content.stdout
+debug output
 TASK [Verify kube-apiserver line exists] ***************************************
 task path: /agent/_work/2/s/layer-dcukubernetes/ansible/kubespray/falco-patch-debug.yml:3
 ok: [nasdcu4ncm05] => {
