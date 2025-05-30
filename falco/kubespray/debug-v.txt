@@ -1,0 +1,27 @@
+getting below insertion with this task
+- hosts: kube_control_plane
+  tasks:
+    # 3. Add volume to kube-apiserver manifest
+    - name: Add Falco audit webhook volume
+      blockinfile:
+        path: /etc/kubernetes/manifests/kube-apiserver.yaml
+        marker: "# {mark} FALCO AUDIT VOLUME"
+        insertafter: '^ {2}volumes:'
+        block: |
+          - name: falco-webhook-config
+            hostPath:
+              path: /etc/kubernetes/falco/webhook-config.yaml
+              type: File
+kube-apiserver.yaml after running the task
+  volumes:
+# BEGIN FALCO AUDIT VOLUME
+- name: falco-webhook-config
+  hostPath:
+    path: /etc/kubernetes/falco/webhook-config.yaml
+    type: File
+# END FALCO AUDIT VOLUME
+  - hostPath:
+      path: /opt/app/audit
+      type: ""
+    name: audit-logs
+
