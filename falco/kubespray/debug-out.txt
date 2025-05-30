@@ -1,0 +1,103 @@
+TASK [Verify kube-apiserver line exists] ***************************************
+task path: /agent/_work/2/s/layer-dcukubernetes/ansible/kubespray/falco-patch-debug.yml:3
+ok: [nasdcu4ncm05] => {
+    "changed": false,
+    "cmd": [
+        "grep",
+        "-n",
+        "^\\s*-\\s*kube-apiserver",
+        "/etc/kubernetes/manifests/kube-apiserver.yaml"
+    ],
+    "delta": "0:00:00.003078",
+    "end": "2025-05-30 14:47:05.981491",
+    "invocation": {
+        "module_args": {
+            "_raw_params": "grep -n '^\\s*-\\s*kube-apiserver' /etc/kubernetes/manifests/kube-apiserver.yaml",
+            "_uses_shell": false,
+            "argv": null,
+            "chdir": null,
+            "creates": null,
+            "executable": null,
+            "expand_argument_vars": true,
+            "removes": null,
+            "stdin": null,
+            "stdin_add_newline": true,
+            "strip_empty_ends": true
+        }
+    },
+    "msg": "",
+    "rc": 0,
+    "start": "2025-05-30 14:47:05.978413",
+    "stderr": "",
+    "stderr_lines": [],
+    "stdout": "15:    - kube-apiserver",
+    "stdout_lines": [
+        "15:    - kube-apiserver"
+    ]
+}
+
+TASK [Show grep results] *******************************************************
+task path: /agent/_work/2/s/layer-dcukubernetes/ansible/kubespray/falco-patch-debug.yml:8
+ok: [nasdcu4ncm04] => {
+    "grep_result.stdout": "15:    - kube-apiserver"
+}
+
+TASK [Check file indentation] **************************************************
+task path: /agent/_work/2/s/layer-dcukubernetes/ansible/kubespray/falco-patch-debug.yml:12
+ok: [nasdcu4ncm04] => {
+    "changed": false,
+    "cmd": [
+        "cat",
+        "-A",
+        "/etc/kubernetes/manifests/kube-apiserver.yaml"
+    ],
+    "delta": "0:00:00.003203",
+    "end": "2025-05-30 14:47:07.769779",
+    "invocation": {
+        "module_args": {
+            "_raw_params": "cat -A /etc/kubernetes/manifests/kube-apiserver.yaml",
+            "_uses_shell": false,
+            "argv": null,
+            "chdir": null,
+            "creates": null,
+            "executable": null,
+            "expand_argument_vars": true,
+            "removes": null,
+            "stdin": null,
+            "stdin_add_newline": true,
+            "strip_empty_ends": true
+        }
+    },
+    "msg": "",
+    "rc": 0,
+    "start": "2025-05-30 14:47:07.766576",
+    "stderr": "",
+    "stderr_lines": [],
+
+
+    "stdout_lines": [
+        "apiVersion: v1$",
+        "kind: Pod$",
+        "metadata:$",
+        "  annotations:$",
+        "    kubeadm.kubernetes.io/kube-apiserver.advertise-address.endpoint: 135.21.180.108:6443$",
+        "  creationTimestamp: null$",
+        "  labels:$",
+        "    component: kube-apiserver$",
+        "    tier: control-plane$",
+        "  name: kube-apiserver$",
+        "  namespace: kube-system$",
+        "spec:$",
+        "  containers:$",
+        "  - command:$",
+        "    - kube-apiserver$",
+        "    - --advertise-address=135.21.180.108$",
+        "    - --allow-privileged=true$",
+        "    - --anonymous-auth=True$",
+        "    - --apiserver-count=3$",
+
+      TASK [Display file with visible whitespace] ************************************
+task path: /agent/_work/2/s/layer-dcukubernetes/ansible/kubespray/falco-patch-debug.yml:17
+ok: [nasdcu4ncm04] => {
+    "file_content.stdout": "apiVersion: v1$\nkind: Pod$\nmetadata:$\n  annotations:$\n    kubeadm.kubernetes.io/kube-apiserver.advertise-address.endpoint: 135.21.180.108:6443$\n  creationTimestamp: null$\n  labels:$\n    component: kube-apiserver$\n    tier: control-plane$\n  name: kube-apiserver$\n  namespace: kube-system$\nspec:$\n  containers:$\n  - command:$\n    - kube-apiserver$\n    - --advertise-address=135.21.180.108$\n    - --allow-privileged=true$\n    - --anonymous-auth=True$\n    - --apiserver-count=3$\n    - --audit-log-maxage=2$\n    - --audit-log-maxbackup=2$\n    - --audit-log-maxsize=100$\n    - --audit-log-path=/opt/app/audit/kube-apiserver-log.json$\n    - --audit-policy-file=/etc/kubernetes/audit-policy/apiserver-audit-policy.yaml$\n    - --authorization-mode=Node,RBAC$\n    - --bind-address=0.0.0.0$\n    - --client-ca-file=/etc/kubernetes/ssl/ca.crt$\n    - --default-not-ready-toleration-seconds=300$\n    - --default-unreachable-toleration-seconds=300$\n    - --enable-admission-plugins=NodeRestriction,PodSecurity$\n    - --enable-aggregator-routing=False$\n    - --enable-bootstrap-token-auth=true$\n    - --endpoint-reconciler-type=lease$\n    - --etcd-cafile=/etc/ssl/etcd/ssl/ca.pem$\n    - --etcd-certfile=/etc/ssl/etcd/ssl/node-nasdcu4ncm04.pem$\n    - --etcd-compaction-interval=5m0s$\n    - --etcd-keyfile=/etc/ssl/etcd/ssl/node-nasdcu4ncm04-key.pem$\n    - --etcd-servers=https://135.21.180.108:2379,https://135.21.180.109:2379,https://135.21.180.110:2379$\n    - --event-ttl=1h0m0s$\n    - --kubelet-client-certificate=/etc/kubernetes/ssl/apiserver-kubelet-client.crt$\n    - --kubelet-client-key=/etc/kubernetes/ssl/apiserver-kubelet-client.key$\n    - --kubelet-preferred-address-types=InternalDNS,InternalIP,Hostname,ExternalDNS,ExternalIP$\n    - --oidc-client-id=kubernetes$\n    - --oidc-groups-claim=groups$\n    - --oidc-groups-prefix=$\n    - --oidc-issuer-url=https://ndcu-dex-nasa-dev-01.dcu.idns.cip.att.com:30271/dex$\n    - --oidc-username-claim=email$\n    - --oidc-username-prefix=-$\n    - --profiling=False$\n    - --proxy-client-cert-file=/etc/kubernetes/ssl/front-proxy-client.crt$\n    - --proxy-client-key-file=/etc/kubernetes/ssl/front-proxy-client.key$\n    - --request-timeout=1m0s$\n    - --requestheader-allowed-names=front-proxy-client$\n    - --requestheader-client-ca-file=/etc/kubernetes/ssl/front-proxy-ca.crt$\n    - --requestheader-extra-headers-prefix=X-Remote-Extra-$\n    - --requestheader-group-headers=X-Remote-Group$\n    - --requestheader-username-headers=X-Remote-User$\n    - --secure-port=6443$\n    - --service-account-issuer=https://kubernetes.default.svc.cluster.local$\n    - --service-account-key-file=/etc/kubernetes/ssl/sa.pub$\n    - --service-account-lookup=True$\n    - --service-account-signing-key-file=/etc/kubernetes/ssl/sa.key$\n    - --service-cluster-ip-range=10.233.0.0/18$\n    - --service-node-port-range=30000-32767$\n    - --storage-backend=etcd3$\n    - --tls-cert-file=/etc/kubernetes/ssl/apiserver.crt$\n    - --tls-cipher-suites=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,TLS_RSA_WITH_AES_128_GCM_SHA256,TLS_RSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_128_CBC_SHA,TLS_RSA_WITH_AES_256_CBC_SHA$\n    - --tls-private-key-file=/etc/kubernetes/ssl/apiserver.key$\n    image: artifact.it.att.com/apm0012178-dkr-mcom-group/kube-apiserver:v1.31.4$\n    imagePullPolicy: IfNotPresent$\n    livenessProbe:$\n      failureThreshold: 8$\n      httpGet:$\n        host: 135.21.180.108$\n        path: /livez$\n        port: 6443$\n        scheme: HTTPS$\n      initialDelaySeconds: 10$\n      periodSeconds: 10$\n      timeoutSeconds: 15$\n    name: kube-apiserver$\n    readinessProbe:$\n      failureThreshold: 3$\n      httpGet:$\n        host: 135.21.180.108$\n        path: /readyz$\n        port: 6443$\n        scheme: HTTPS$\n      periodSeconds: 1$\n      timeoutSeconds: 15$\n    resources:$\n      requests:$\n        cpu: 250m$\n    startupProbe:$\n      failureThreshold: 24$\n      httpGet:$\n        host: 135.21.180.108$\n        path: /livez$\n        port: 6443$\n        scheme: HTTPS$\n      initialDelaySeconds: 10$\n      periodSeconds: 10$\n      timeoutSeconds: 15$\n    volumeMounts:$\n    - mountPath: /opt/app/audit$\n      name: audit-logs$\n    - mountPath: /etc/kubernetes/audit-policy$\n      name: audit-policy$\n    - mountPath: /etc/ssl/certs$\n      name: ca-certs$\n      readOnly: true$\n    - mountPath: /etc/ca-certificates$\n      name: etc-ca-certificates$\n      readOnly: true$\n    - mountPath: /etc/ssl/etcd/ssl$\n      name: etcd-certs-0$\n      readOnly: true$\n    - mountPath: /etc/kubernetes/ssl$\n      name: k8s-certs$\n      readOnly: true$\n    - mountPath: /etc/kubernetes/tokens$\n      name: token-auth-config$\n    - mountPath: /usr/local/share/ca-certificates$\n      name: usr-local-share-ca-certificates$\n      readOnly: true$\n    - mountPath: /usr/share/ca-certificates$\n      name: usr-share-ca-certificates$\n      readOnly: true$\n  hostNetwork: true$\n  priority: 2000001000$\n  priorityClassName: system-node-critical$\n  securityContext:$\n    seccompProfile:$\n      type: RuntimeDefault$\n  volumes:$\n  - hostPath:$\n      path: /opt/app/audit$\n      type: \"\"$\n    name: audit-logs$\n  - hostPath:$\n      path: /etc/kubernetes/audit-policy$\n      type: \"\"$\n    name: audit-policy$\n  - hostPath:$\n      path: /etc/ssl/certs$\n      type: DirectoryOrCreate$\n    name: ca-certs$\n  - hostPath:$\n      path: /etc/ca-certificates$\n      type: DirectoryOrCreate$\n    name: etc-ca-certificates$\n  - hostPath:$\n      path: /etc/ssl/etcd/ssl$\n      type: DirectoryOrCreate$\n    name: etcd-certs-0$\n  - hostPath:$\n      path: /etc/kubernetes/ssl$\n      type: DirectoryOrCreate$\n    name: k8s-certs$\n  - hostPath:$\n      path: /etc/kubernetes/tokens$\n      type: \"\"$\n    name: token-auth-config$\n  - hostPath:$\n      path: /usr/local/share/ca-certificates$\n      type: DirectoryOrCreate$\n    name: usr-local-share-ca-certificates$\n  - hostPath:$\n      path: /usr/share/ca-certificates$\n      type: \"\"$\n    name: usr-share-ca-certificates$\nstatus: {}$"
+}
