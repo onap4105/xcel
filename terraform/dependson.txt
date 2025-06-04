@@ -1,0 +1,25 @@
+resource "null_resource" "create_dir" {
+  count = var.action == "patch" ? 1 : 0
+
+  triggers = {
+    always_run = timestamp()
+  }
+
+  provisioner "local-exec" {
+    command = "mkdir -p ansible/kubespray/falco ansible/kubespray/dex ansible/kubespray/k8s-audit"
+  }
+
+  depends_on = [
+    null_resource.kubespray_download
+  ]
+}
+
+resource "local_file" "falco_patch_yml" {
+  content  = data.template_file.falco_patch_yml.rendered
+  filename = "ansible/kubespray/falco/falco-patch.yml"
+
+  depends_on = [
+    null_resource.kubespray_download,
+    null_resource.create_dir[*]
+  ]
+}
