@@ -1,0 +1,58 @@
+{
+  "$schema": "https://vega.github.io/schema/vega/v5.json",
+  "description": "Edge-to-Edge Banner",
+  "autosize": {"type": "none", "resize": true},
+  "width": 2000,
+  "height": 50,
+  "padding": 0,
+  "background": "transparent",
+  "data": [
+    {
+      "name": "nav_links",
+      "values": [
+        {"label": "Home", "url": "kibana:dashboard:home", "xpos": 100},
+        {"label": "Reports", "url": "kibana:dashboard:reports", "xpos": 200},
+        {"label": "Analytics", "url": "kibana:dashboard:analytics", "xpos": 300},
+        {"label": "Settings", "url": "kibana:dashboard:settings", "xpos": 400}
+      ]
+    }
+  ],
+  "marks": [
+    {
+      "type": "rect",
+      "encode": {
+        "enter": {
+          "x": {"value": 0},
+          "y": {"value": 0},
+          "width": {"signal": "width"},
+          "height": {"signal": "height"},
+          "fill": {"value": "linear-gradient(to right, #1a73e8, #0043a0)"}
+        }
+      }
+    },
+    {
+      "type": "text",
+      "from": {"data": "nav_links"},
+      "encode": {
+        "enter": {
+          "x": {"field": "xpos"},
+          "y": {"value": 25},
+          "text": {"field": "label"},
+          "fontSize": {"value": 14},
+          "fill": {"value": "white"},
+          "fontWeight": {"value": "bold"},
+          "baseline": {"value": "middle"},
+          "cursor": {"value": "pointer"}
+        },
+        "hover": {
+          "fill": {"value": "#FFD700"}
+        }
+      },
+      "events": {
+        "click": {
+          "update": "{href: datum.url}"
+        }
+      }
+    }
+  ]
+}
