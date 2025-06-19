@@ -1,0 +1,68 @@
+{
+  "$schema": "https://vega.github.io/schema/vega/v5.json",
+  "autosize": "none",
+  "width": 2000,
+  "height": 60,
+  "padding": 0,
+
+  "signals": [
+    {
+      "name": "containerWidth",
+      "update": "width"
+    }
+  ],
+
+  "data": [
+    {
+      "name": "label",
+      "values": [
+        {
+          "label": "ELNAS Event Report",
+          "color": "#00A8E0",
+          "url": "https://nsas-pst-01-kibana.nsas.cnx.tnet.att.com/s/elnas/app/dashboards#/view/3a6a0446-a19e-489a-bb59-7485b2e10a87"
+        }
+      ]
+    }
+  ],
+
+  "marks": [
+    {
+      "type": "rect",
+      "from": {"data": "label"},
+      "encode": {
+        "enter": {
+          "x": {"value": 0},
+          "y": {"value": 5},
+          "width": {"signal": "containerWidth"},
+          "height": {"value": 40},
+          "fill": {"field": "color"},
+          "stroke": {"value": "none"},
+          "strokeWidth": {"value": 0},
+          "cornerRadius": {"value": 4},
+          "cursor": {"value": "pointer"},
+          "href": {"field": "url"},
+          "target": {"value": "_self"}
+        }
+      }
+    },
+    {
+      "type": "text",
+      "from": {"data": "label"},
+      "encode": {
+        "enter": {
+          "x": {"value": 10},             // Left padding
+          "y": {"value": 25},
+          "text": {"field": "label"},
+          "fill": {"value": "white"},
+          "align": {"value": "left"},     // Left align text
+          "baseline": {"value": "middle"},
+          "fontWeight": {"value": "bold"},
+          "fontSize": {"value": 16},
+          "cursor": {"value": "pointer"},
+          "href": {"field": "url"},
+          "target": {"value": "_self"}
+        }
+      }
+    }
+  ]
+}
