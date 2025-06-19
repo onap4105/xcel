@@ -1,53 +1,29 @@
 {
   "$schema": "https://vega.github.io/schema/vega/v5.json",
-  "description": "Dashboard Links with Filters",
+  "description": "Report Dashboard Links",
   "autosize": "none",
   "width": 300,
-  "height": 400,
+  "height": 300,
   "padding": 20,
   "data": [
     {
       "name": "reports",
       "values": [
-        {
-          "id": "repor1",
-          "label": "Sales Report",
-          "url": "kibana:dashboard:repor1?_a=(query:(language:kuery,query:'status:completed AND region:EMEA'))"
-        },
-        {
-          "id": "repor2",
-          "label": "Traffic Analysis",
-          "url": "kibana:dashboard:repor2?_a=(query:(language:kuery,query:'device_type:mobile'))"
-        },
-        {
-          "id": "repor3",
-          "label": "Error Dashboard",
-          "url": "kibana:dashboard:repor3"
-        }
-      ],
-      "transform": [
-        {
-          "type": "collect",
-          "sort": {"field": "label"}
-        },
-        {
-          "type": "formula",
-          "as": "index",
-          "expr": "datum_index"
-        }
+        {"id": "repor1", "label": "Sales Report", "url": "kibana:dashboard:repor1", "ypos": 30},
+        {"id": "repor2", "label": "Traffic Analysis", "url": "kibana:dashboard:repor2", "ypos": 60},
+        {"id": "repor3", "label": "Error Dashboard", "url": "kibana:dashboard:repor3", "ypos": 90},
+        {"id": "repor4", "label": "Performance", "url": "kibana:dashboard:repor4", "ypos": 120},
+        {"id": "repor5", "label": "Security", "url": "kibana:dashboard:repor5", "ypos": 150},
+        {"id": "repor6", "label": "Audit Logs", "url": "kibana:dashboard:repor6", "ypos": 180},
+        {"id": "repor7", "label": "User Activity", "url": "kibana:dashboard:repor7", "ypos": 210},
+        {"id": "repor8", "label": "System Health", "url": "kibana:dashboard:repor8", "ypos": 240},
+        {"id": "repor9", "label": "API Monitoring", "url": "kibana:dashboard:repor9", "ypos": 270}
       ]
     }
   ],
   "marks": [
     {
       "type": "group",
-      "name": "report_links",
-      "encode": {
-        "enter": {
-          "x": {"value": 0},
-          "y": {"value": 0}
-        }
-      },
       "marks": [
         {
           "type": "text",
@@ -55,16 +31,15 @@
           "encode": {
             "enter": {
               "x": {"value": 0},
-              "y": {"field": {"signal": "25 * (datum.index + 1)"}},
+              "y": {"field": "ypos"},
               "text": {"field": "label"},
               "fontSize": {"value": 14},
-              "fill": {"value": "#006BB4"},
-              "fontWeight": {"value": "normal"},
+              "fill": {"value": "#1a73e8"},
               "baseline": {"value": "middle"},
               "cursor": {"value": "pointer"}
             },
             "hover": {
-              "fill": {"value": "red"},
+              "fill": {"value": "#d93025"},
               "fontWeight": {"value": "bold"}
             }
           },
