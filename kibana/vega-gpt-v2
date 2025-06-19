@@ -1,0 +1,71 @@
+{
+  "$schema": "https://vega.github.io/schema/vega/v5.json",
+  "description": "Report Dashboard Links with Hover Fix and Dynamic Base URL",
+  "autosize": "none",
+  "width": 300,
+  "height": 300,
+  "padding": 20,
+  "signals": [
+    {
+      "name": "baseUrl",
+      "value": "/app/kibana#/dashboard/"
+    },
+    {
+      "name": "hover",
+      "value": null,
+      "on": [
+        {"events": "text:mouseover", "update": "datum"},
+        {"events": "text:mouseout", "update": "null"}
+      ]
+    }
+  ],
+  "data": [
+    {
+      "name": "reports",
+      "values": [
+        {"id": "repor1-dashboard-id", "label": "Sales Report", "ypos": 30},
+        {"id": "repor2-dashboard-id", "label": "Traffic Analysis", "ypos": 60},
+        {"id": "repor3-dashboard-id", "label": "Error Dashboard", "ypos": 90},
+        {"id": "repor4-dashboard-id", "label": "Performance", "ypos": 120},
+        {"id": "repor5-dashboard-id", "label": "Security", "ypos": 150},
+        {"id": "repor6-dashboard-id", "label": "Audit Logs", "ypos": 180},
+        {"id": "repor7-dashboard-id", "label": "User Activity", "ypos": 210},
+        {"id": "repor8-dashboard-id", "label": "System Health", "ypos": 240},
+        {"id": "repor9-dashboard-id", "label": "API Monitoring", "ypos": 270}
+      ]
+    }
+  ],
+  "marks": [
+    {
+      "type": "group",
+      "marks": [
+        {
+          "type": "text",
+          "from": {"data": "reports"},
+          "encode": {
+            "enter": {
+              "x": {"value": 0},
+              "y": {"field": "ypos"},
+              "text": {"field": "label"},
+              "href": {"signal": "baseUrl + datum.id"},
+              "fontSize": {"value": 14},
+              "baseline": {"value": "middle"},
+              "cursor": {"value": "pointer"}
+            },
+            "update": {
+              "fill": {
+                "test": "hover && hover.id === datum.id",
+                "value": "#d93025"
+              },
+              "fontWeight": {
+                "test": "hover && hover.id === datum.id",
+                "value": "bold"
+              },
+              "fillOpacity": {"value": 1}
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
