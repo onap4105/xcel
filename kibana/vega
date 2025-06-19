@@ -12,32 +12,28 @@
         {
           "id": "repor1",
           "label": "Sales Report",
-          "filter1": "status:completed",
-          "filter2": "region:EMEA"
+          "url": "kibana:dashboard:repor1?_a=(query:(language:kuery,query:'status:completed AND region:EMEA'))"
         },
         {
           "id": "repor2",
           "label": "Traffic Analysis",
-          "filter1": "device_type:mobile",
-          "filter2": ""
+          "url": "kibana:dashboard:repor2?_a=(query:(language:kuery,query:'device_type:mobile'))"
         },
         {
           "id": "repor3",
           "label": "Error Dashboard",
-          "filter1": "",
-          "filter2": ""
+          "url": "kibana:dashboard:repor3"
         }
       ],
       "transform": [
         {
-          "type": "formula",
-          "as": "filter_string",
-          "expr": "join([datum.filter1, datum.filter2], ' AND ')"
+          "type": "collect",
+          "sort": {"field": "label"}
         },
         {
           "type": "formula",
-          "as": "url",
-          "expr": "if(datum.filter_string != '', 'kibana:dashboard:' + datum.id + '?_a=(query:(language:kuery,query:\\'' + replace(datum.filter_string, '\\'', '\\\\\\'') + '\\'))', 'kibana:dashboard:' + datum.id)"
+          "as": "index",
+          "expr": "datum_index"
         }
       ]
     }
@@ -59,7 +55,7 @@
           "encode": {
             "enter": {
               "x": {"value": 0},
-              "y": {"field": {"signal": "25 * (datumIndex + 1)"}},
+              "y": {"field": {"signal": "25 * (datum.index + 1)"}},
               "text": {"field": "label"},
               "fontSize": {"value": 14},
               "fill": {"value": "#006BB4"},
