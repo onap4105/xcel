@@ -2,7 +2,7 @@
   "$schema": "https://vega.github.io/schema/vega/v5.json",
   "description": "Dashboard Links with Filters",
   "width": 300,
-  "height": 300,
+  "height": 400,
   "padding": 20,
   "data": [
     {
@@ -12,54 +12,30 @@
           "id": "repor1",
           "label": "Sales Report",
           "filters": [
-            {
-              "field": "status",
-              "value": "completed",
-              "operator": "is"
-            },
-            {
-              "field": "region",
-              "value": "EMEA",
-              "operator": "is"
-            }
+            {"field": "status", "operator": "is", "value": "completed"},
+            {"field": "region", "operator": "is", "value": "EMEA"}
           ]
         },
         {
           "id": "repor2",
           "label": "Traffic Analysis",
           "filters": [
-            {
-              "field": "device_type",
-              "value": "mobile",
-              "operator": "is"
-            }
+            {"field": "device_type", "operator": "is", "value": "mobile"}
           ]
         },
         {
           "id": "repor3",
           "label": "Error Dashboard",
-          "filters": []  // No filters
+          "filters": []
+        }
+      ],
+      "transform": [
+        {
+          "type": "formula",
+          "as": "url",
+          "expr": "if(length(datum.filters) > 0, 'kibana:dashboard:' + datum.id + '?_a=(filters:!(' + join(datum.filters, ',', function(f) { return '(col:\\'' + f.field + '\\',op:\\'' + f.operator + '\\',val:\\'' + replace(f.value, '\\'', '\\\\\\'') + '\\')' }) + '))', 'kibana:dashboard:' + datum.id)"
         }
       ]
-    }
-  ],
-  "signals": [
-    {
-      "name": "buildDashboardUrl",
-      "value": function(dashboardId, filters) {
-        // Handle empty filters
-        if (!filters || filters.length === 0) {
-          return `kibana:dashboard:${dashboardId}`;
-        }
-        
-        // Format filters and escape single quotes
-        const kibanaFilters = filters.map(filter => {
-          const escapedValue = filter.value.replace(/'/g, "\\'");
-          return `(col:'${filter.field}',op:'${filter.operator}',val:'${escapedValue}')`;
-        }).join(",");
-        
-        return `kibana:dashboard:${dashboardId}?_a=(filters:!(${kibanaFilters}))`;
-      }
     }
   ],
   "marks": [
@@ -94,7 +70,7 @@
           },
           "events": {
             "click": {
-              "update": "{href: buildDashboardUrl(datum.id, datum.filters)}"
+              "update": "{href: datum.url}"
             }
           }
         }
