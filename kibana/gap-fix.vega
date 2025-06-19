@@ -1,0 +1,70 @@
+{
+  "$schema": "https://vega.github.io/schema/vega/v5.json",
+  "autosize": {"type": "none", "resize": true},
+  "width": 2000,
+  "height": 50,
+  "padding": 0,
+  "background": "transparent",
+  "signals": [
+    {
+      "name": "containerWidth",
+      "value": 2000,
+      "on": [
+        {
+          "events": {"source": "window", "type": "resize"},
+          "update": "window.innerWidth"
+        }
+      ]
+    }
+  ],
+  "data": [
+    {
+      "name": "label",
+      "values": [
+        {
+          "label": "ELNAS Event Report",
+          "color": "#00A8E0",
+          "url": "https://nsas-pst-01-kibana.nsas.cnx.tnet.att.com/s/elnas/app/dashboards#/view/3a6a0446-a19e-489a-bb59-7485b2e10a87"
+        }
+      ]
+    }
+  ],
+  "marks": [
+    {
+      "type": "rect",
+      "encode": {
+        "enter": {
+          "x": {"value": 0},
+          "y": {"value": 0},
+          "height": {"value": 50},
+          "fill": {"field": "color"},
+          "cornerRadius": {"value": 0}
+        },
+        "update": {
+          "width": {"signal": "containerWidth"}
+        }
+      }
+    },
+    {
+      "type": "text",
+      "encode": {
+        "enter": {
+          "x": {"value": 20},
+          "y": {"value": 25},
+          "text": {"field": "label"},
+          "fill": {"value": "white"},
+          "align": {"value": "left"},
+          "baseline": {"value": "middle"},
+          "fontWeight": {"value": "bold"},
+          "fontSize": {"value": 16},
+          "cursor": {"value": "pointer"}
+        }
+      },
+      "events": {
+        "click": {
+          "update": "{href: 'https://nsas-pst-01-kibana.nsas.cnx.tnet.att.com/s/elnas/app/dashboards#/view/3a6a0446-a19e-489a-bb59-7485b2e10a87', target: '_self'}"
+        }
+      }
+    }
+  ]
+}
