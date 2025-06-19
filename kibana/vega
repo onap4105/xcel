@@ -1,0 +1,57 @@
+{
+  "$schema": "https://vega.github.io/schema/vega/v5.json",
+  "data": [
+    {
+      "name": "reports",
+      "values": [
+        {
+          "id": "repor1",
+          "label": "Sales Report",
+          "filters": [
+            {
+              "field": "status",
+              "value": "completed",
+              "operator": "is"
+            },
+            {
+              "field": "region",
+              "value": "EMEA",
+              "operator": "is"
+            }
+          ]
+        },
+        // ... other reports
+      ]
+    }
+  ],
+  "marks": [
+    {
+      "type": "text",
+      "from": {"data": "reports"},
+      "encode": {
+        "enter": {
+          "text": {"field": "label"},
+          "cursor": {"value": "pointer"}
+        }
+      },
+      "events": {
+        "click": {
+          "update": "{href: buildDashboardUrl(datum.id, datum.filters)}"
+        }
+      }
+    }
+  ],
+  "signals": [
+    {
+      "name": "buildDashboardUrl",
+      "value": function(dashboardId, filters) {
+        // Convert filters to Kibana URL format
+        const kibanaFilters = filters.map(filter => 
+          `(col:'${filter.field}',op:'${filter.operator}',val:'${filter.value}')`
+        ).join(",");
+        
+        return `kibana:dashboard:${dashboardId}?_a=(filters:!(${kibanaFilters}))`;
+      }
+    }
+  ]
+}
