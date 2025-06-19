@@ -2,21 +2,17 @@
   "$schema": "https://vega.github.io/schema/vega/v5.json",
   "autosize": {"type": "none", "resize": true},
   "width": 2000,
-  "height": 50,
+  "height": 60,
   "padding": 0,
   "background": "transparent",
+
   "signals": [
     {
       "name": "containerWidth",
-      "value": 2000,
-      "on": [
-        {
-          "events": {"source": "window", "type": "resize"},
-          "update": "window.innerWidth"
-        }
-      ]
+      "update": "width"
     }
   ],
+
   "data": [
     {
       "name": "label",
@@ -29,6 +25,7 @@
       ]
     }
   ],
+
   "marks": [
     {
       "type": "rect",
@@ -36,8 +33,8 @@
         "enter": {
           "x": {"value": 0},
           "y": {"value": 0},
-          "height": {"value": 50},
-          "fill": {"field": "color"},
+          "height": {"value": 60},
+          "fill": {"value": "#00A8E0"},
           "cornerRadius": {"value": 0}
         },
         "update": {
@@ -50,8 +47,8 @@
       "encode": {
         "enter": {
           "x": {"value": 20},
-          "y": {"value": 25},
-          "text": {"field": "label"},
+          "y": {"value": 30},
+          "text": {"value": "ELNAS Event Report"},
           "fill": {"value": "white"},
           "align": {"value": "left"},
           "baseline": {"value": "middle"},
