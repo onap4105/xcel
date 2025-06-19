@@ -39,7 +39,7 @@
           "y": {"value": 0},
           "fill": {"value": "#00A8E0"},
           "cornerRadius": {"value": 0},
-          "cursor": {"value": "auto"}  // Default cursor for non-clickable area
+          "cursor": {"value": "auto"}
         },
         "update": {
           "width": {"signal": "containerWidth"},
@@ -53,18 +53,18 @@
         "enter": {
           "x": {"value": 20},
           "text": {"value": "ELNAS Event Report"},
-          "fill": {"value": "white"},
           "align": {"value": "left"},
           "baseline": {"value": "middle"},
           "fontWeight": {"value": "bold"},
           "fontSize": {"value": 16},
-          "cursor": {"value": "pointer"}  // Pointer only on text
+          "cursor": {"value": "pointer"}
         },
         "update": {
-          "y": {"signal": "verticalCenter"}
+          "y": {"signal": "verticalCenter"},
+          "fill": {"value": "white"}  // Normal state color
         },
         "hover": {
-          "fill": {"value": "#FFFF00"}  // Yellow hover effect on text only
+          "fill": {"value": "#FFFF00"}  // Hover state color
         }
       },
       "events": {
