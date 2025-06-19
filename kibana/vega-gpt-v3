@@ -1,6 +1,6 @@
 {
   "$schema": "https://vega.github.io/schema/vega/v5.json",
-  "description": "Report Dashboard Links with Fixed Hover in Kibana",
+  "description": "Fixed hover highlight using signals in Kibana Vega",
   "autosize": "none",
   "width": 300,
   "height": 300,
@@ -9,6 +9,14 @@
     {
       "name": "baseUrl",
       "value": "/app/kibana#/dashboard/"
+    },
+    {
+      "name": "hover",
+      "value": null,
+      "on": [
+        {"events": "text:mouseover", "update": "datum"},
+        {"events": "text:mouseout", "update": "null"}
+      ]
     }
   ],
   "data": [
@@ -38,13 +46,16 @@
           "text": {"field": "label"},
           "href": {"signal": "baseUrl + datum.id"},
           "fontSize": {"value": 14},
-          "fill": {"value": "#1a73e8"},
           "baseline": {"value": "middle"},
           "cursor": {"value": "pointer"}
         },
-        "hover": {
-          "fill": {"value": "#d93025"},
-          "fontWeight": {"value": "bold"}
+        "update": {
+          "fill": {
+            "signal": "hover && hover.id === datum.id ? '#d93025' : '#1a73e8'"
+          },
+          "fontWeight": {
+            "signal": "hover && hover.id === datum.id ? 'bold' : 'normal'"
+          }
         }
       }
     }
