@@ -1,43 +1,32 @@
 {
   "$schema": "https://vega.github.io/schema/vega/v5.json",
   "description": "Edge-to-Edge Banner",
-  "autosize": {"type": "none", "resize": true},
-  "width": 2000,
-  "height": 50,
-  "padding": 0,
+  "autosize": "none",
+  "width": 1000,
+  "height": 40,
   "background": "transparent",
-  "data": [
-    {
-      "name": "nav_links",
-      "values": [
-        {"label": "Home", "url": "kibana:dashboard:home", "xpos": 100},
-        {"label": "Reports", "url": "kibana:dashboard:reports", "xpos": 200},
-        {"label": "Analytics", "url": "kibana:dashboard:analytics", "xpos": 300},
-        {"label": "Settings", "url": "kibana:dashboard:settings", "xpos": 400}
-      ]
-    }
-  ],
   "marks": [
+    // Background rectangle
     {
       "type": "rect",
       "encode": {
         "enter": {
           "x": {"value": 0},
           "y": {"value": 0},
-          "width": {"signal": "width"},
-          "height": {"signal": "height"},
-          "fill": {"value": "linear-gradient(to right, #1a73e8, #0043a0)"}
+          "width": {"value": 1000},
+          "height": {"value": 40},
+          "fill": {"value": "#1a73e8"}
         }
       }
     },
+    // Home link
     {
       "type": "text",
-      "from": {"data": "nav_links"},
       "encode": {
         "enter": {
-          "x": {"field": "xpos"},
-          "y": {"value": 25},
-          "text": {"field": "label"},
+          "x": {"value": 20},
+          "y": {"value": 20},
+          "text": {"value": "Home"},
           "fontSize": {"value": 14},
           "fill": {"value": "white"},
           "fontWeight": {"value": "bold"},
@@ -50,7 +39,55 @@
       },
       "events": {
         "click": {
-          "update": "{href: datum.url}"
+          "update": "{href: 'kibana:dashboard:home'}"
+        }
+      }
+    },
+    // Reports link
+    {
+      "type": "text",
+      "encode": {
+        "enter": {
+          "x": {"value": 100},
+          "y": {"value": 20},
+          "text": {"value": "Reports"},
+          "fontSize": {"value": 14},
+          "fill": {"value": "white"},
+          "fontWeight": {"value": "bold"},
+          "baseline": {"value": "middle"},
+          "cursor": {"value": "pointer"}
+        },
+        "hover": {
+          "fill": {"value": "#FFD700"}
+        }
+      },
+      "events": {
+        "click": {
+          "update": "{href: 'kibana:dashboard:reports'}"
+        }
+      }
+    },
+    // Analytics link
+    {
+      "type": "text",
+      "encode": {
+        "enter": {
+          "x": {"value": 200},
+          "y": {"value": 20},
+          "text": {"value": "Analytics"},
+          "fontSize": {"value": 14},
+          "fill": {"value": "white"},
+          "fontWeight": {"value": "bold"},
+          "baseline": {"value": "middle"},
+          "cursor": {"value": "pointer"}
+        },
+        "hover": {
+          "fill": {"value": "#FFD700"}
+        }
+      },
+      "events": {
+        "click": {
+          "update": "{href: 'kibana:dashboard:analytics'}"
         }
       }
     }
