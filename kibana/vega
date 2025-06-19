@@ -1,5 +1,9 @@
 {
   "$schema": "https://vega.github.io/schema/vega/v5.json",
+  "description": "Dashboard Links with Filters",
+  "width": 300,
+  "height": 300,
+  "padding": 20,
   "data": [
     {
       "name": "reports",
@@ -20,38 +24,81 @@
             }
           ]
         },
-        // ... other reports
+        {
+          "id": "repor2",
+          "label": "Traffic Analysis",
+          "filters": [
+            {
+              "field": "device_type",
+              "value": "mobile",
+              "operator": "is"
+            }
+          ]
+        },
+        {
+          "id": "repor3",
+          "label": "Error Dashboard",
+          "filters": []  // No filters
+        }
       ]
-    }
-  ],
-  "marks": [
-    {
-      "type": "text",
-      "from": {"data": "reports"},
-      "encode": {
-        "enter": {
-          "text": {"field": "label"},
-          "cursor": {"value": "pointer"}
-        }
-      },
-      "events": {
-        "click": {
-          "update": "{href: buildDashboardUrl(datum.id, datum.filters)}"
-        }
-      }
     }
   ],
   "signals": [
     {
       "name": "buildDashboardUrl",
       "value": function(dashboardId, filters) {
-        // Convert filters to Kibana URL format
-        const kibanaFilters = filters.map(filter => 
-          `(col:'${filter.field}',op:'${filter.operator}',val:'${filter.value}')`
-        ).join(",");
+        // Handle empty filters
+        if (!filters || filters.length === 0) {
+          return `kibana:dashboard:${dashboardId}`;
+        }
+        
+        // Format filters and escape single quotes
+        const kibanaFilters = filters.map(filter => {
+          const escapedValue = filter.value.replace(/'/g, "\\'");
+          return `(col:'${filter.field}',op:'${filter.operator}',val:'${escapedValue}')`;
+        }).join(",");
         
         return `kibana:dashboard:${dashboardId}?_a=(filters:!(${kibanaFilters}))`;
       }
+    }
+  ],
+  "marks": [
+    {
+      "type": "group",
+      "name": "report_links",
+      "encode": {
+        "enter": {
+          "x": {"value": 0},
+          "y": {"value": 0}
+        }
+      },
+      "marks": [
+        {
+          "type": "text",
+          "from": {"data": "reports"},
+          "encode": {
+            "enter": {
+              "x": {"value": 0},
+              "y": {"field": {"signal": "25 * (datumIndex + 1)"}},
+              "text": {"field": "label"},
+              "fontSize": {"value": 14},
+              "fill": {"value": "#006BB4"},
+              "fontWeight": {"value": "normal"},
+              "baseline": {"value": "middle"},
+              "cursor": {"value": "pointer"}
+            },
+            "hover": {
+              "fill": {"value": "red"},
+              "fontWeight": {"value": "bold"}
+            }
+          },
+          "events": {
+            "click": {
+              "update": "{href: buildDashboardUrl(datum.id, datum.filters)}"
+            }
+          }
+        }
+      ]
     }
   ]
 }
