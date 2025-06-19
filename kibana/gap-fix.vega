@@ -5,11 +5,15 @@
   "height": 60,
   "padding": 0,
   "background": "transparent",
-
+  
   "signals": [
     {
       "name": "containerWidth",
       "update": "width"
+    },
+    {
+      "name": "verticalCenter",
+      "update": "height / 2"
     }
   ],
 
@@ -33,12 +37,13 @@
         "enter": {
           "x": {"value": 0},
           "y": {"value": 0},
-          "height": {"value": 60},
           "fill": {"value": "#00A8E0"},
-          "cornerRadius": {"value": 0}
+          "cornerRadius": {"value": 0},
+          "cursor": {"value": "auto"}  // Default cursor for non-clickable area
         },
         "update": {
-          "width": {"signal": "containerWidth"}
+          "width": {"signal": "containerWidth"},
+          "height": {"signal": "height"}
         }
       }
     },
@@ -47,14 +52,19 @@
       "encode": {
         "enter": {
           "x": {"value": 20},
-          "y": {"value": 30},
           "text": {"value": "ELNAS Event Report"},
           "fill": {"value": "white"},
           "align": {"value": "left"},
           "baseline": {"value": "middle"},
           "fontWeight": {"value": "bold"},
           "fontSize": {"value": 16},
-          "cursor": {"value": "pointer"}
+          "cursor": {"value": "pointer"}  // Pointer only on text
+        },
+        "update": {
+          "y": {"signal": "verticalCenter"}
+        },
+        "hover": {
+          "fill": {"value": "#FFFF00"}  // Yellow hover effect on text only
         }
       },
       "events": {
