@@ -1,1 +1,5 @@
-    Found '{' where a key name was expected (check your syntax or use quotes if the key name includes {}[],: or whitespace) at line 51,47 >>>        if (!filters ...
+
+    "width" and "height" params are ignored because "autosize" is enabled. Set "autosize": "none" to disable
+
+    Expression parse error: if(length(datum.filters) > 0, 'kibana:dashboard:' + datum.id + '?_a=(filters:!(' + join(datum.filters, ',', function(f) { return '(col:\'' + f.field + '\',op:\'' + f.operator + '\',val:\'' + replace(f.value, '\'', '\\\'') + '\')' }) + '))', 'kibana:dashboard:' + datum.id)
+
