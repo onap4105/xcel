@@ -1,0 +1,16 @@
+<div style="
+    background: #1a73e8;
+    padding: 12px 20px;
+    color: white;
+    font-weight: bold;
+    display: flex;
+    gap: 25px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+">
+  <a href="kibana:dashboard:home" style="color: white; text-decoration: none">Home</a>
+  <a href="kibana:dashboard:reports" style="color: white; text-decoration: none">Reports</a>
+  <a href="kibana:dashboard:analytics" style="color: white; text-decoration: none">Analytics</a>
+  <a href="kibana:dashboard:settings" style="color: white; text-decoration: none">Settings</a>
+</div>
