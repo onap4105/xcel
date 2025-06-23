@@ -9,7 +9,7 @@
   "signals": [
     {
       "name": "baseUrl",
-      "value": "https://nsas-pst-01-kibana.nsas.cnx.tnet.att.com/s/elnas/app/dashboards#/view/"
+      "value": "https://nsas-pst-01-kibana.nsas.cnx.tnet.abc.com/s/elnas/app/dashboards#/view/"
     },
     {
       "name": "hover",
