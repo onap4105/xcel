@@ -13,17 +13,17 @@
     {
       "name": "showGroup1",
       "value": true,
-      "bind": {"input": "checkbox", "name": "Available Report Group 1"}
+      "bind": { "input": "checkbox", "name": "Available Report Group 1" }
     },
     {
       "name": "showGroup2",
       "value": false,
-      "bind": {"input": "checkbox", "name": "Available Report Group 2"}
+      "bind": { "input": "checkbox", "name": "Available Report Group 2" }
     },
     {
       "name": "showGroup3",
       "value": false,
-      "bind": {"input": "checkbox", "name": "Available Report Group 3"}
+      "bind": { "input": "checkbox", "name": "Available Report Group 3" }
     }
   ],
 
@@ -50,72 +50,54 @@
       ]
     },
     {
-      "name": "groupCounts",
+      "name": "groupLabels",
+      "values": [
+        {"group": 1, "label": "Available Report Group 1", "y": 20},
+        {"group": 2, "label": "Available Report Group 2", "y": 190},
+        {"group": 3, "label": "Available Report Group 3", "y": 350}
+      ]
+    },
+    {
+      "name": "visibleReports",
       "source": "reports",
       "transform": [
         {
-          "type": "aggregate",
-          "groupby": ["group"],
-          "ops": ["count"],
-          "fields": ["id"],
-          "as": ["count"]
+          "type": "filter",
+          "expr": "(datum.group === 1 && showGroup1) || (datum.group === 2 && showGroup2) || (datum.group === 3 && showGroup3)"
+        },
+        {
+          "type": "window",
+          "ops": ["row_number"],
+          "as": ["row"],
+          "groupby": ["group"]
+        },
+        {
+          "type": "formula",
+          "as": "y",
+          "expr": "datum.group === 1 ? 50 + datum.row * 20 : datum.group === 2 ? 220 + datum.row * 20 : 380 + datum.row * 20"
         }
       ]
     }
   ],
 
   "marks": [
-    // Group headers
     {
       "type": "text",
-      "from": {
-        "data": "groupCounts",
-        "transform": [
-          {
-            "type": "formula",
-            "expr": "datum.group == 1 ? 0 : datum.group == 2 ? 1 : 2",
-            "as": "order"
-          },
-          {
-            "type": "window",
-            "sort": [{"field": "order", "order": "ascending"}],
-            "ops": ["rank"],
-            "as": ["rank"]
-          }
-        ]
-      },
+      "from": {"data": "groupLabels"},
       "encode": {
         "enter": {
           "x": {"value": 5},
+          "y": {"field": "y"},
+          "text": {"field": "label"},
           "fontSize": {"value": 16},
           "fontWeight": {"value": "bold"},
-          "fill": {"value": "#333"}
-        },
-        "update": {
-          "y": {
-            "signal": "datum.rank * 30 + (datum.group - 1) * 140"
-          },
-          "text": {
-            "signal": "'Available Report Group ' + datum.group"
-          }
+          "fill": {"value": "#000"}
         }
       }
     },
-
-    // Reports for group 1
     {
       "type": "text",
-      "from": {
-        "data": "reports",
-        "transform": [
-          {"type": "filter", "expr": "datum.group == 1 && showGroup1"},
-          {
-            "type": "window",
-            "ops": ["row_number"],
-            "as": ["row"]
-          }
-        ]
-      },
+      "from": {"data": "visibleReports"},
       "encode": {
         "enter": {
           "x": {"value": 20},
@@ -124,69 +106,12 @@
           "cursor": {"value": "pointer"}
         },
         "update": {
-          "y": {"signal": "50 + datum.row * 20"},
-          "text": {"signal": "datum.label"},
-          "href": {"signal": "baseUrl + datum.id"}
-        }
-      }
-    },
-
-    // Reports for group 2
-    {
-      "type": "text",
-      "from": {
-        "data": "reports",
-        "transform": [
-          {"type": "filter", "expr": "datum.group == 2 && showGroup2"},
-          {
-            "type": "window",
-            "ops": ["row_number"],
-            "as": ["row"]
-          }
-        ]
-      },
-      "encode": {
-        "enter": {
-          "x": {"value": 20},
-          "fontSize": {"value": 14},
-          "fill": {"value": "#1a73e8"},
-          "cursor": {"value": "pointer"}
-        },
-        "update": {
-          "y": {"signal": "190 + datum.row * 20"},
-          "text": {"signal": "datum.label"},
-          "href": {"signal": "baseUrl + datum.id"}
-        }
-      }
-    },
-
-    // Reports for group 3
-    {
-      "type": "text",
-      "from": {
-        "data": "reports",
-        "transform": [
-          {"type": "filter", "expr": "datum.group == 3 && showGroup3"},
-          {
-            "type": "window",
-            "ops": ["row_number"],
-            "as": ["row"]
-          }
-        ]
-      },
-      "encode": {
-        "enter": {
-          "x": {"value": 20},
-          "fontSize": {"value": 14},
-          "fill": {"value": "#1a73e8"},
-          "cursor": {"value": "pointer"}
-        },
-        "update": {
-          "y": {"signal": "340 + datum.row * 20"},
-          "text": {"signal": "datum.label"},
+          "y": {"field": "y"},
+          "text": {"field": "label"},
           "href": {"signal": "baseUrl + datum.id"}
         }
       }
     }
   ]
 }
+
