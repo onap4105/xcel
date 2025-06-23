@@ -1,0 +1,53 @@
+{
+  "$schema": "https://vega.github.io/schema/vega/v5.json",
+  "autosize": "none",
+  "width": 500,
+  "height": 800,
+  "padding": 10,
+
+  "signals": [
+    { "name": "baseUrl", "value": "<YOUR_BASE_URL>#" },
+    { "name": "showGroup1", "value": true, "bind": { "input": "checkbox", "name": "Group 1" } },
+    { "name": "showGroup2", "value": false, "bind": { "input": "checkbox", "name": "Group 2" } },
+    { "name": "showGroup3", "value": false, "bind": { "input": "checkbox", "name": "Group 3" } }
+  ],
+
+  "data": [
+    {
+      "name": "reports",
+      "values": [
+        { "id": "a", "label": "Report 1", "group": 1 },
+        { "id": "b", "label": "Report 2", "group": 1 },
+        { "id": "c", "label": "Report 3", "group": 1 },
+        { "id": "d", "label": "Report 4", "group": 2 },
+        { "id": "e", "label": "Report 5", "group": 2 },
+        { "id": "f", "label": "Report 6", "group": 3 }
+      ]
+    }
+  ],
+
+  "marks": [
+    {
+      "type": "text",
+      "from": {
+        "data": "reports",
+        "transform": [
+          { "type": "filter", "expr": "(datum.group==1 && showGroup1) || (datum.group==2 && showGroup2) || (datum.group==3 && showGroup3)" },
+          { "type": "window", "ops": ["rank"], "as": ["row"] },
+          { "type": "formula", "as": "y", "expr": "30 + datum.row * 25" }
+        ]
+      },
+      "encode": {
+        "enter": {
+          "x": { "value": 20 },
+          "y": { "field": "y" },
+          "text": { "signal": "datum.group + '.' + datum.row + ' ' + datum.label" },
+          "href": { "signal": "baseUrl + datum.id" },
+          "fontSize": { "value": 14 },
+          "cursor": { "value": "pointer" },
+          "fill": { "value": "#1a73e8" }
+        }
+      }
+    }
+  ]
+}
