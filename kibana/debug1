@@ -1,160 +1,116 @@
 {
   "$schema": "https://vega.github.io/schema/vega/v5.json",
-  "autosize": "none",
   "width": 600,
-  "padding": 20,
+  "height": 600,
+  "padding": 10,
+  "autosize": "none",
+
   "signals": [
     {
       "name": "baseUrl",
       "value": "https://your-kibana-url/dashboard-id/"
     },
     {
-      "name": "group1_expanded",
+      "name": "showGroup1",
       "value": true,
       "bind": {"input": "checkbox", "name": "Available Report Group 1"}
     },
     {
-      "name": "group2_expanded",
+      "name": "showGroup2",
       "value": false,
       "bind": {"input": "checkbox", "name": "Available Report Group 2"}
     },
     {
-      "name": "group3_expanded",
+      "name": "showGroup3",
       "value": false,
       "bind": {"input": "checkbox", "name": "Available Report Group 3"}
-    },
-    {
-      "name": "height",
-      "update": "20 + (group1_expanded ? 50 + 8*20 : 30) + (group2_expanded ? 50 + 4*20 : 30) + (group3_expanded ? 50 + 2*20 : 30)"
     }
   ],
+
   "data": [
     {
       "name": "reports",
       "values": [
-        {"id": "id1", "label": "Report A1", "group": 1},
-        {"id": "id2", "label": "Report A2", "group": 1},
-        {"id": "id3", "label": "Report B1", "group": 2},
-        {"id": "id4", "label": "Report C1", "group": 3}
+        {"id": "id1", "label": "Alarm_Message - eventType(1, 2, 3)", "group": 1},
+        {"id": "id2", "label": "Alarm_Environment_Message — eventType(4, 5)", "group": 1},
+        {"id": "id3", "label": "AlarmDetail — eventType(6)", "group": 1},
+        {"id": "id4", "label": "autoTrunkTestAlarm — eventType(7)", "group": 1},
+        {"id": "id5", "label": "SbackUpAlarm — eventType(9)", "group": 1},
+        {"id": "id6", "label": "reportCondition — eventType(10)", "group": 1},
+        {"id": "id7", "label": "diagnosticAlarm — eventType(11)", "group": 1},
+        {"id": "id8", "label": "diagnosticAlarmDetails — eventType(12)", "group": 1},
+
+        {"id": "id9", "label": "eventAlarm — eventType(13)", "group": 2},
+        {"id": "id10", "label": "exerciseAlarm — eventType(14)", "group": 2},
+        {"id": "id11", "label": "removalAlarm and restorationAlarm — eventType(18, 19)", "group": 2},
+        {"id": "id12", "label": "removalAlarm or restorationAlarm — eventType(20)", "group": 2},
+
+        {"id": "id13", "label": "more report A", "group": 3},
+        {"id": "id14", "label": "more report B", "group": 3}
+      ]
+    },
+    {
+      "name": "groupLabels",
+      "values": [
+        {"group": 1, "label": "Available Report Group 1", "y": 20},
+        {"group": 2, "label": "Available Report Group 2", "y": 190},
+        {"group": 3, "label": "Available Report Group 3", "y": 350}
+      ]
+    },
+    {
+      "name": "visibleReports",
+      "source": "reports",
+      "transform": [
+        {
+          "type": "filter",
+          "expr": "(datum.group === 1 && showGroup1) || (datum.group === 2 && showGroup2) || (datum.group === 3 && showGroup3)"
+        },
+        {
+          "type": "window",
+          "ops": ["row_number"],
+          "as": ["row"],
+          "groupby": ["group"]
+        },
+        {
+          "type": "formula",
+          "as": "y",
+          "expr": "datum.group === 1 ? 50 + (datum.row - 1) * 25 : datum.group === 2 ? 220 + (datum.row - 1) * 25 : 380 + (datum.row - 1) * 25"
+        }
       ]
     }
   ],
+
   "marks": [
     {
       "type": "text",
-      "name": "group1_header",
+      "from": {"data": "groupLabels"},
       "encode": {
         "enter": {
           "x": {"value": 5},
-          "y": {"value": 20},
+          "y": {"field": "y"},
+          "text": {"field": "label"},
           "fontSize": {"value": 16},
           "fontWeight": {"value": "bold"},
           "fill": {"value": "#000"}
-        },
-        "update": {
-          "text": {"value": "Available Report Group 1"}
         }
       }
     },
     {
       "type": "text",
-      "name": "group1_reports",
-      "from": {"data": "reports"},
-      "transform": [
-        {"type": "filter", "expr": "datum.group === 1"}
-      ],
+      "from": {"data": "visibleReports"},
       "encode": {
         "enter": {
-          "x": {"value": 20},
+          "x": {"value": 25},
           "fontSize": {"value": 14},
           "fill": {"value": "#1a73e8"},
           "cursor": {"value": "pointer"}
         },
         "update": {
-          "y": {"expr": "50 + (index() * 20)"},
+          "y": {"field": "y"},
           "text": {"field": "label"},
-          "href": {"signal": "baseUrl + datum.id"},
-          "opacity": {"signal": "group1_expanded ? 1 : 0"}
-        }
-      }
-    },
-    {
-      "type": "text",
-      "name": "group2_header",
-      "encode": {
-        "enter": {
-          "x": {"value": 5},
-          "fontSize": {"value": 16},
-          "fontWeight": {"value": "bold"},
-          "fill": {"value": "#000"}
-        },
-        "update": {
-          "y": {"signal": "group1_expanded ? 50 + 8*20 + 30 : 30"},
-          "text": {"value": "Available Report Group 2"}
-        }
-      }
-    },
-    {
-      "type": "text",
-      "name": "group2_reports",
-      "from": {"data": "reports"},
-      "transform": [
-        {"type": "filter", "expr": "datum.group === 2"}
-      ],
-      "encode": {
-        "enter": {
-          "x": {"value": 20},
-          "fontSize": {"value": 14},
-          "fill": {"value": "#1a73e8"},
-          "cursor": {"value": "pointer"}
-        },
-        "update": {
-          "y": {"expr": "(group1_expanded ? 50 + 8*20 + 30 : 30) + 30 + (index() * 20)"},
-          "text": {"field": "label"},
-          "href": {"signal": "baseUrl + datum.id"},
-          "opacity": {"signal": "group2_expanded ? 1 : 0"}
-        }
-      }
-    },
-    {
-      "type": "text",
-      "name": "group3_header",
-      "encode": {
-        "enter": {
-          "x": {"value": 5},
-          "fontSize": {"value": 16},
-          "fontWeight": {"value": "bold"},
-          "fill": {"value": "#000"}
-        },
-        "update": {
-          "y": {"signal": "group2_expanded ? (group1_expanded ? 50 + 8*20 + 30 + 50 + 4*20 + 30 : 50 + 4*20 + 30) : (group1_expanded ? 50 + 8*20 + 30 : 30)"},
-          "text": {"value": "Available Report Group 3"}
-        }
-      }
-    },
-    {
-      "type": "text",
-      "name": "group3_reports",
-      "from": {"data": "reports"},
-      "transform": [
-        {"type": "filter", "expr": "datum.group === 3"}
-      ],
-      "encode": {
-        "enter": {
-          "x": {"value": 20},
-          "fontSize": {"value": 14},
-          "fill": {"value": "#1a73e8"},
-          "cursor": {"value": "pointer"}
-        },
-        "update": {
-          "y": {"expr": "(group2_expanded ? (group1_expanded ? 50 + 8*20 + 30 + 50 + 4*20 + 30 : 50 + 4*20 + 30) : (group1_expanded ? 50 + 8*20 + 30 : 30)) + 30 + (index() * 20)"},
-          "text": {"field": "label"},
-          "href": {"signal": "baseUrl + datum.id"},
-          "opacity": {"signal": "group3_expanded ? 1 : 0"}
+          "href": {"signal": "baseUrl + datum.id"}
         }
       }
     }
-  ],
-  "height": {"signal": "height"}
+  ]
 }
-Mark transforms should not generate new data.
