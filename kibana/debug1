@@ -157,3 +157,4 @@
   ],
   "height": {"signal": "height"}
 }
+Mark transforms should not generate new data.
