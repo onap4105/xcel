@@ -89,7 +89,7 @@
   "description": "Report Dashboard Links with Expand/Collapse",
   "autosize": "none",
   "width": 400,
-  "height": 480,
+  "height": 500,
   "padding": 10,
 
   "signals": [
@@ -109,7 +109,13 @@
       "name": "expanded",
       "value": false,
       "on": [
-        {"events": "header:click", "update": "!expanded"}
+        {
+          "events": {
+            "type": "click",
+            "markname": "toggle"
+          },
+          "update": "!expanded"
+        }
       ]
     }
   ],
@@ -154,7 +160,7 @@
 
   "marks": [
     {
-      "name": "header",
+      "name": "toggle",
       "type": "text",
       "encode": {
         "enter": {
@@ -195,3 +201,4 @@
     }
   ]
 }
+
