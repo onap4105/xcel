@@ -24,228 +24,135 @@
       "bind": {"input": "checkbox", "name": "Available Report Group 3"}
     },
     {
-      "name": "group1Count",
-      "value": 8
-    },
-    {
-      "name": "group2Count",
-      "value": 4
-    },
-    {
-      "name": "group3Count",
-      "value": 2
-    },
-    {
       "name": "height",
-      "update": "20 + (group1_expanded ? (50 + group1Count * 20) : 30) + 30 + (group2_expanded ? (50 + group2Count * 20) : 30) + 30 + (group3_expanded ? (50 + group3Count * 20) : 30) + 20"
+      "update": "20 + (group1_expanded ? 50 + 8*20 : 30) + (group2_expanded ? 50 + 4*20 : 30) + (group3_expanded ? 50 + 2*20 : 30)"
     }
   ],
   "data": [
     {
       "name": "reports",
       "values": [
-        {"id": "id1", "label": "Alarm_Message - eventType(1, 2, 3)", "group": 1},
-        {"id": "id2", "label": "Alarm_Environment_Message — eventType(4, 5)", "group": 1},
-        {"id": "id3", "label": "AlarmDetail — eventType(6)", "group": 1},
-        {"id": "id4", "label": "autoTrunkTestAlarm — eventType(7)", "group": 1},
-        {"id": "id5", "label": "SbackUpAlarm — eventType(9)", "group": 1},
-        {"id": "id6", "label": "reportCondition — eventType(10)", "group": 1},
-        {"id": "id7", "label": "diagnosticAlarm — eventType(11)", "group": 1},
-        {"id": "id8", "label": "diagnosticAlarmDetails — eventType(12)", "group": 1},
-        {"id": "id9", "label": "eventAlarm — eventType(13)", "group": 2},
-        {"id": "id10", "label": "exerciseAlarm — eventType(14)", "group": 2},
-        {"id": "id11", "label": "removalAlarm and restorationAlarm — eventType(18, 19)", "group": 2},
-        {"id": "id12", "label": "removalAlarm or restorationAlarm — eventType(20)", "group": 2},
-        {"id": "id13", "label": "more report A", "group": 3},
-        {"id": "id14", "label": "more report B", "group": 3}
-      ]
-    },
-    {
-      "name": "group1_reports",
-      "source": "reports",
-      "transform": [
-        {"type": "filter", "expr": "datum.group === 1"},
-        {
-          "type": "window",
-          "ops": ["row_number"],
-          "as": ["row"],
-          "groupby": ["group"]
-        }
-      ]
-    },
-    {
-      "name": "group2_reports",
-      "source": "reports",
-      "transform": [
-        {"type": "filter", "expr": "datum.group === 2"},
-        {
-          "type": "window",
-          "ops": ["row_number"],
-          "as": ["row"],
-          "groupby": ["group"]
-        }
-      ]
-    },
-    {
-      "name": "group3_reports",
-      "source": "reports",
-      "transform": [
-        {"type": "filter", "expr": "datum.group === 3"},
-        {
-          "type": "window",
-          "ops": ["row_number"],
-          "as": ["row"],
-          "groupby": ["group"]
-        }
+        {"id": "id1", "label": "Report A1", "group": 1},
+        {"id": "id2", "label": "Report A2", "group": 1},
+        {"id": "id3", "label": "Report B1", "group": 2},
+        {"id": "id4", "label": "Report C1", "group": 3}
       ]
     }
   ],
   "marks": [
     {
-      "type": "group",
-      "name": "group1_container",
+      "type": "text",
+      "name": "group1_header",
       "encode": {
         "enter": {
-          "x": {"value": 0},
+          "x": {"value": 5},
           "y": {"value": 20},
-          "width": {"value": 600}
-        }
-      },
-      "marks": [
-        {
-          "type": "text",
-          "encode": {
-            "enter": {
-              "x": {"value": 5},
-              "y": {"value": 0},
-              "fontSize": {"value": 16},
-              "fontWeight": {"value": "bold"},
-              "fill": {"value": "#000"}
-            },
-            "update": {
-              "text": {"value": "Available Report Group 1"}
-            }
-          }
-        },
-        {
-          "type": "text",
-          "from": {"data": "group1_reports"},
-          "encode": {
-            "enter": {
-              "x": {"value": 20},
-              "fontSize": {"value": 14},
-              "fill": {"value": "#1a73e8"},
-              "cursor": {"value": "pointer"}
-            },
-            "update": {
-              "y": {"expr": "30 + (datum.row - 1) * 20"},
-              "text": {"field": "label"},
-              "href": {"signal": "baseUrl + datum.id"},
-              "opacity": {"signal": "group1_expanded ? 1 : 0"}
-            }
-          }
-        }
-      ]
-    },
-    {
-      "type": "group",
-      "name": "group2_container",
-      "encode": {
-        "enter": {
-          "x": {"value": 0},
-          "width": {"value": 600}
+          "fontSize": {"value": 16},
+          "fontWeight": {"value": "bold"},
+          "fill": {"value": "#000"}
         },
         "update": {
-          "y": {
-            "signal": "20 + (group1_expanded ? (50 + group1Count * 20) : 30) + 30"
-          }
+          "text": {"value": "Available Report Group 1"}
         }
-      },
-      "marks": [
-        {
-          "type": "text",
-          "encode": {
-            "enter": {
-              "x": {"value": 5},
-              "y": {"value": 0},
-              "fontSize": {"value": 16},
-              "fontWeight": {"value": "bold"},
-              "fill": {"value": "#000"}
-            },
-            "update": {
-              "text": {"value": "Available Report Group 2"}
-            }
-          }
-        },
-        {
-          "type": "text",
-          "from": {"data": "group2_reports"},
-          "encode": {
-            "enter": {
-              "x": {"value": 20},
-              "fontSize": {"value": 14},
-              "fill": {"value": "#1a73e8"},
-              "cursor": {"value": "pointer"}
-            },
-            "update": {
-              "y": {"expr": "30 + (datum.row - 1) * 20"},
-              "text": {"field": "label"},
-              "href": {"signal": "baseUrl + datum.id"},
-              "opacity": {"signal": "group2_expanded ? 1 : 0"}
-            }
-          }
-        }
-      ]
+      }
     },
     {
-      "type": "group",
-      "name": "group3_container",
+      "type": "text",
+      "name": "group1_reports",
+      "from": {"data": "reports"},
+      "transform": [
+        {"type": "filter", "expr": "datum.group === 1"}
+      ],
       "encode": {
         "enter": {
-          "x": {"value": 0},
-          "width": {"value": 600}
+          "x": {"value": 20},
+          "fontSize": {"value": 14},
+          "fill": {"value": "#1a73e8"},
+          "cursor": {"value": "pointer"}
         },
         "update": {
-          "y": {
-            "signal": "20 + (group1_expanded ? (50 + group1Count * 20) : 30) + 30 + (group2_expanded ? (50 + group2Count * 20) : 30) + 30"
-          }
+          "y": {"expr": "50 + (index() * 20)"},
+          "text": {"field": "label"},
+          "href": {"signal": "baseUrl + datum.id"},
+          "opacity": {"signal": "group1_expanded ? 1 : 0"}
         }
-      },
-      "marks": [
-        {
-          "type": "text",
-          "encode": {
-            "enter": {
-              "x": {"value": 5},
-              "y": {"value": 0},
-              "fontSize": {"value": 16},
-              "fontWeight": {"value": "bold"},
-              "fill": {"value": "#000"}
-            },
-            "update": {
-              "text": {"value": "Available Report Group 3"}
-            }
-          }
+      }
+    },
+    {
+      "type": "text",
+      "name": "group2_header",
+      "encode": {
+        "enter": {
+          "x": {"value": 5},
+          "fontSize": {"value": 16},
+          "fontWeight": {"value": "bold"},
+          "fill": {"value": "#000"}
         },
-        {
-          "type": "text",
-          "from": {"data": "group3_reports"},
-          "encode": {
-            "enter": {
-              "x": {"value": 20},
-              "fontSize": {"value": 14},
-              "fill": {"value": "#1a73e8"},
-              "cursor": {"value": "pointer"}
-            },
-            "update": {
-              "y": {"expr": "30 + (datum.row - 1) * 20"},
-              "text": {"field": "label"},
-              "href": {"signal": "baseUrl + datum.id"},
-              "opacity": {"signal": "group3_expanded ? 1 : 0"}
-            }
-          }
+        "update": {
+          "y": {"signal": "group1_expanded ? 50 + 8*20 + 30 : 30"},
+          "text": {"value": "Available Report Group 2"}
         }
-      ]
+      }
+    },
+    {
+      "type": "text",
+      "name": "group2_reports",
+      "from": {"data": "reports"},
+      "transform": [
+        {"type": "filter", "expr": "datum.group === 2"}
+      ],
+      "encode": {
+        "enter": {
+          "x": {"value": 20},
+          "fontSize": {"value": 14},
+          "fill": {"value": "#1a73e8"},
+          "cursor": {"value": "pointer"}
+        },
+        "update": {
+          "y": {"expr": "(group1_expanded ? 50 + 8*20 + 30 : 30) + 30 + (index() * 20)"},
+          "text": {"field": "label"},
+          "href": {"signal": "baseUrl + datum.id"},
+          "opacity": {"signal": "group2_expanded ? 1 : 0"}
+        }
+      }
+    },
+    {
+      "type": "text",
+      "name": "group3_header",
+      "encode": {
+        "enter": {
+          "x": {"value": 5},
+          "fontSize": {"value": 16},
+          "fontWeight": {"value": "bold"},
+          "fill": {"value": "#000"}
+        },
+        "update": {
+          "y": {"signal": "group2_expanded ? (group1_expanded ? 50 + 8*20 + 30 + 50 + 4*20 + 30 : 50 + 4*20 + 30) : (group1_expanded ? 50 + 8*20 + 30 : 30)"},
+          "text": {"value": "Available Report Group 3"}
+        }
+      }
+    },
+    {
+      "type": "text",
+      "name": "group3_reports",
+      "from": {"data": "reports"},
+      "transform": [
+        {"type": "filter", "expr": "datum.group === 3"}
+      ],
+      "encode": {
+        "enter": {
+          "x": {"value": 20},
+          "fontSize": {"value": 14},
+          "fill": {"value": "#1a73e8"},
+          "cursor": {"value": "pointer"}
+        },
+        "update": {
+          "y": {"expr": "(group2_expanded ? (group1_expanded ? 50 + 8*20 + 30 + 50 + 4*20 + 30 : 50 + 4*20 + 30) : (group1_expanded ? 50 + 8*20 + 30 : 30)) + 30 + (index() * 20)"},
+          "text": {"field": "label"},
+          "href": {"signal": "baseUrl + datum.id"},
+          "opacity": {"signal": "group3_expanded ? 1 : 0"}
+        }
+      }
     }
   ],
   "height": {"signal": "height"}
