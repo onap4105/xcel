@@ -202,52 +202,35 @@
   ]
 }
 =============================================================================
-
 {
   "$schema": "https://vega.github.io/schema/vega/v5.json",
   "autosize": "none",
   "width": 500,
   "height": 800,
   "padding": 10,
+
   "signals": [
-    { "name": "baseUrl", "value": "https://nsas-pst-01-kibana.nsas.cnx.tnet.abc.com/s/elnas/app/dashboards#/view/" },
     {
-      "name": "hover",
-      "value": null,
-      "on": [
-        { "events": "text:mouseover", "update": "datum" },
-        { "events": "text:mouseout", "update": "null" }
-      ]
+      "name": "baseUrl",
+      "value": "https://nsas-pst-01-kibana.nsas.cnx.tnet.abc.com/s/elnas/app/dashboards#/view/"
     },
     {
       "name": "expanded1",
-      "value": false,
-      "on": [
-        { "events": { "type": "click", "markname": "toggle1" }, "update": "!expanded1" }
-      ]
+      "value": true,
+      "bind": { "input": "checkbox", "name": "Expand Group 1: " }
     },
     {
       "name": "expanded2",
       "value": false,
-      "on": [
-        { "events": { "type": "click", "markname": "toggle2" }, "update": "!expanded2" }
-      ]
+      "bind": { "input": "checkbox", "name": "Expand Group 2: " }
     },
     {
       "name": "expanded3",
       "value": false,
-      "on": [
-        { "events": { "type": "click", "markname": "toggle3" }, "update": "!expanded3" }
-      ]
-    },
-    { "name": "group1Count", "update": "8" },
-    { "name": "group2Count", "update": "4" },
-    { "name": "group3Count", "update": "2" },
-    { "name": "group1Height", "update": "expanded1 ? group1Count * 30 : 0" },
-    { "name": "group2Y", "update": "40 + group1Height" },
-    { "name": "group2Height", "update": "expanded2 ? group2Count * 30 : 0" },
-    { "name": "group3Y", "update": "group2Y + 30 + group2Height" }
+      "bind": { "input": "checkbox", "name": "Expand Group 3: " }
+    }
   ],
+
   "data": [
     {
       "name": "reports",
@@ -266,35 +249,35 @@
         { "id": "repor12", "label": "removalAlarm or restorationAlarm — eventType(20)" },
         { "id": "repor13", "label": "more report" },
         { "id": "repor14", "label": "more report" }
-      ],
-      "transform": [
-        { "type": "window", "ops": ["rank"], "as": ["index"] }
       ]
     }
   ],
+
   "marks": [
+    // Group 1 Header
     {
-      "name": "toggle1",
       "type": "text",
       "encode": {
         "enter": {
           "x": { "value": 10 },
           "y": { "value": 20 },
-          "text": { "signal": "expanded1 ? '▼ Available Report Group 1' : '▶ Available Report Group 1'" },
+          "text": { "value": "Available Report Group 1" },
           "fontSize": { "value": 16 },
           "fontWeight": { "value": "bold" },
-          "fill": { "value": "#000" },
-          "cursor": { "value": "pointer" }
+          "fill": { "value": "#000" }
         }
       }
     },
+    // Group 1 Items
     {
       "type": "text",
       "from": {
         "data": "reports",
         "transform": [
-          { "type": "filter", "expr": "datum.index <= 8 && expanded1" },
-          { "type": "formula", "as": "ypos", "expr": "(datum.index - 1) * 30 + 40" }
+          { "type": "filter", "expr": "datum.index <= 8" },
+          { "type": "filter", "expr": "expanded1" },
+          { "type": "window", "ops": ["row_number"], "as": ["rownum"] },
+          { "type": "formula", "as": "ypos", "expr": "30 + datum.rownum * 25" }
         ]
       },
       "encode": {
@@ -309,28 +292,35 @@
         }
       }
     },
+
+    // Group 2 Header
     {
-      "name": "toggle2",
       "type": "text",
       "encode": {
         "enter": {
           "x": { "value": 10 },
-          "y": { "signal": "group2Y" },
-          "text": { "signal": "expanded2 ? '▼ Available Report Group 2' : '▶ Available Report Group 2'" },
+          "y": { "signal": "expanded1 ? 250 : 50" },
+          "text": { "value": "Available Report Group 2" },
           "fontSize": { "value": 16 },
           "fontWeight": { "value": "bold" },
-          "fill": { "value": "#000" },
-          "cursor": { "value": "pointer" }
+          "fill": { "value": "#000" }
         }
       }
     },
+    // Group 2 Items
     {
       "type": "text",
       "from": {
         "data": "reports",
         "transform": [
-          { "type": "filter", "expr": "datum.index > 8 && datum.index <= 12 && expanded2" },
-          { "type": "formula", "as": "ypos", "expr": "(datum.index - 9) * 30 + group2Y + 20" }
+          { "type": "filter", "expr": "datum.index > 8 && datum.index <= 12" },
+          { "type": "filter", "expr": "expanded2" },
+          { "type": "window", "ops": ["row_number"], "as": ["rownum"] },
+          {
+            "type": "formula",
+            "as": "ypos",
+            "expr": "expanded1 ? 260 + datum.rownum * 25 : 60 + datum.rownum * 25"
+          }
         ]
       },
       "encode": {
@@ -345,28 +335,37 @@
         }
       }
     },
+
+    // Group 3 Header
     {
-      "name": "toggle3",
       "type": "text",
       "encode": {
         "enter": {
           "x": { "value": 10 },
-          "y": { "signal": "group3Y" },
-          "text": { "signal": "expanded3 ? '▼ Available Report Group 3' : '▶ Available Report Group 3'" },
+          "y": {
+            "signal": "expanded1 && expanded2 ? 410 : expanded1 ? 260 : expanded2 ? 160 : 80"
+          },
+          "text": { "value": "Available Report Group 3" },
           "fontSize": { "value": 16 },
           "fontWeight": { "value": "bold" },
-          "fill": { "value": "#000" },
-          "cursor": { "value": "pointer" }
+          "fill": { "value": "#000" }
         }
       }
     },
+    // Group 3 Items
     {
       "type": "text",
       "from": {
         "data": "reports",
         "transform": [
-          { "type": "filter", "expr": "datum.index > 12 && expanded3" },
-          { "type": "formula", "as": "ypos", "expr": "(datum.index - 13) * 30 + group3Y + 20" }
+          { "type": "filter", "expr": "datum.index > 12" },
+          { "type": "filter", "expr": "expanded3" },
+          { "type": "window", "ops": ["row_number"], "as": ["rownum"] },
+          {
+            "type": "formula",
+            "as": "ypos",
+            "expr": "expanded1 && expanded2 ? 420 + datum.rownum * 25 : expanded1 ? 270 + datum.rownum * 25 : expanded2 ? 170 + datum.rownum * 25 : 90 + datum.rownum * 25"
+          }
         ]
       },
       "encode": {
