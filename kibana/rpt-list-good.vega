@@ -202,3 +202,229 @@
   ]
 }
 
+{
+  "$schema": "https://vega.github.io/schema/vega/v5.json",
+  "description": "Report Dashboard Links with Three Expandable Groups",
+  "autosize": "none",
+  "width": 500,
+  "height": 700,
+  "padding": 10,
+
+  "signals": [
+    {
+      "name": "baseUrl",
+      "value": "https://nsas-pst-01-kibana.nsas.cnx.tnet.abc.com/s/elnas/app/dashboards#/view/"
+    },
+    {
+      "name": "hover",
+      "value": null,
+      "on": [
+        {"events": "text:mouseover", "update": "datum"},
+        {"events": "text:mouseout", "update": "null"}
+      ]
+    },
+    {
+      "name": "expanded1",
+      "value": false,
+      "on": [{"events": {"type": "click", "markname": "toggle1"}, "update": "!expanded1"}]
+    },
+    {
+      "name": "expanded2",
+      "value": false,
+      "on": [{"events": {"type": "click", "markname": "toggle2"}, "update": "!expanded2"}]
+    },
+    {
+      "name": "expanded3",
+      "value": false,
+      "on": [{"events": {"type": "click", "markname": "toggle3"}, "update": "!expanded3"}]
+    }
+  ],
+
+  "data": [
+    {
+      "name": "reports",
+      "values": [
+        {"id": "2b40f4b6-f3cf-4f31-8e00-d4b71fa344c9", "label": "Alarm_Message - eventType(1, 2, 3)"},
+        {"id": "repor2-dashboard-id", "label": "Alarm_Environment_Message — eventType(4, 5)"},
+        {"id": "repor3-dashboard-id", "label": "AlarmDetail — eventType(6)"},
+        {"id": "repor4-dashboard-id", "label": "autoTrunkTestAlarm — eventType(7)"},
+        {"id": "repor5-dashboard-id", "label": "SbackUpAlarm — eventType(9)"},
+        {"id": "repor6-dashboard-id", "label": "reportCondition — eventType(10)"},
+        {"id": "repor7-dashboard-id", "label": "diagnosticAlarm — eventType(11)"},
+        {"id": "repor8-dashboard-id", "label": "diagnosticAlarmDetails — eventType(12)"},
+        {"id": "repor9-dashboard-id", "label": "eventAlarm — eventType(13)"},
+        {"id": "repor10-dashboard-id", "label": "exerciseAlarm — eventType(14)"},
+        {"id": "repor11-dashboard-id", "label": "removalAlarm and restorationAlarm — eventType(18, 19)"},
+        {"id": "repor12-dashboard-id", "label": "removalAlarm or restorationAlarm — eventType(20)"},
+        {"id": "repor13-dashboard-id", "label": "more report"},
+        {"id": "repor14-dashboard-id", "label": "more report"}
+      ],
+      "transform": [
+        {
+          "type": "window",
+          "ops": ["rank"],
+          "as": ["index"]
+        }
+      ]
+    },
+    {
+      "name": "group1",
+      "source": "reports",
+      "transform": [
+        {"type": "filter", "expr": "datum.index <= 8 && expanded1"},
+        {
+          "type": "formula",
+          "as": "ypos",
+          "expr": "(datum.index - 1) * 30 + 50"
+        }
+      ]
+    },
+    {
+      "name": "group2",
+      "source": "reports",
+      "transform": [
+        {"type": "filter", "expr": "datum.index > 8 && datum.index <= 12 && expanded2"},
+        {
+          "type": "formula",
+          "as": "ypos",
+          "expr": "(datum.index - 9) * 30 + 200"
+        }
+      ]
+    },
+    {
+      "name": "group3",
+      "source": "reports",
+      "transform": [
+        {"type": "filter", "expr": "datum.index > 12 && expanded3"},
+        {
+          "type": "formula",
+          "as": "ypos",
+          "expr": "(datum.index - 13) * 30 + 320"
+        }
+      ]
+    }
+  ],
+
+  "marks": [
+    {
+      "name": "toggle1",
+      "type": "text",
+      "encode": {
+        "enter": {
+          "x": {"value": 0},
+          "y": {"value": 20},
+          "text": {
+            "signal": "expanded1 ? '▼ Available Report Group 1' : '▶ Available Report Group 1'"
+          },
+          "fontSize": {"value": 16},
+          "fontWeight": {"value": "bold"},
+          "fill": {"value": "#333"},
+          "cursor": {"value": "pointer"}
+        }
+      }
+    },
+    {
+      "type": "text",
+      "from": {"data": "group1"},
+      "encode": {
+        "enter": {
+          "x": {"value": 10},
+          "y": {"field": "ypos"},
+          "text": {"signal": "datum.index + '. ' + datum.label"},
+          "href": {"signal": "baseUrl + datum.id"},
+          "fontSize": {"value": 14},
+          "baseline": {"value": "middle"},
+          "cursor": {"value": "pointer"}
+        },
+        "update": {
+          "fill": {
+            "signal": "hover && hover.id === datum.id ? '#2558d9' : '#1a73e8'"
+          },
+          "fontWeight": {
+            "signal": "hover && hover.id === datum.id ? 'bold' : 'normal'"
+          }
+        }
+      }
+    },
+    {
+      "name": "toggle2",
+      "type": "text",
+      "encode": {
+        "enter": {
+          "x": {"value": 0},
+          "y": {"value": 180},
+          "text": {
+            "signal": "expanded2 ? '▼ Available Report Group 2' : '▶ Available Report Group 2'"
+          },
+          "fontSize": {"value": 16},
+          "fontWeight": {"value": "bold"},
+          "fill": {"value": "#333"},
+          "cursor": {"value": "pointer"}
+        }
+      }
+    },
+    {
+      "type": "text",
+      "from": {"data": "group2"},
+      "encode": {
+        "enter": {
+          "x": {"value": 10},
+          "y": {"field": "ypos"},
+          "text": {"signal": "datum.index + '. ' + datum.label"},
+          "href": {"signal": "baseUrl + datum.id"},
+          "fontSize": {"value": 14},
+          "baseline": {"value": "middle"},
+          "cursor": {"value": "pointer"}
+        },
+        "update": {
+          "fill": {
+            "signal": "hover && hover.id === datum.id ? '#2558d9' : '#1a73e8'"
+          },
+          "fontWeight": {
+            "signal": "hover && hover.id === datum.id ? 'bold' : 'normal'"
+          }
+        }
+      }
+    },
+    {
+      "name": "toggle3",
+      "type": "text",
+      "encode": {
+        "enter": {
+          "x": {"value": 0},
+          "y": {"value": 300},
+          "text": {
+            "signal": "expanded3 ? '▼ Available Report Group 3' : '▶ Available Report Group 3'"
+          },
+          "fontSize": {"value": 16},
+          "fontWeight": {"value": "bold"},
+          "fill": {"value": "#333"},
+          "cursor": {"value": "pointer"}
+        }
+      }
+    },
+    {
+      "type": "text",
+      "from": {"data": "group3"},
+      "encode": {
+        "enter": {
+          "x": {"value": 10},
+          "y": {"field": "ypos"},
+          "text": {"signal": "datum.index + '. ' + datum.label"},
+          "href": {"signal": "baseUrl + datum.id"},
+          "fontSize": {"value": 14},
+          "baseline": {"value": "middle"},
+          "cursor": {"value": "pointer"}
+        },
+        "update": {
+          "fill": {
+            "signal": "hover && hover.id === datum.id ? '#2558d9' : '#1a73e8'"
+          },
+          "fontWeight": {
+            "signal": "hover && hover.id === datum.id ? 'bold' : 'normal'"
+          }
+        }
+      }
+    }
+  ]
+}
