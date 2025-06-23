@@ -201,41 +201,50 @@
     }
   ]
 }
+=============================================================================
 
 {
   "$schema": "https://vega.github.io/schema/vega/v5.json",
-  "description": "Report Dashboard Links with Dynamic Expand/Collapse Groups",
   "width": 500,
   "height": 700,
   "padding": 10,
 
   "signals": [
     { "name": "baseUrl", "value": "https://nsas-pst-01-kibana.nsas.cnx.tnet.abc.com/s/elnas/app/dashboards#/view/" },
-    { "name": "hover", "value": null,
+
+    {
+      "name": "expanded1",
+      "value": false,
+      "on": [{ "events": { "type": "click", "markname": "toggle1" }, "update": "!expanded1" }]
+    },
+    {
+      "name": "expanded2",
+      "value": false,
+      "on": [{ "events": { "type": "click", "markname": "toggle2" }, "update": "!expanded2" }]
+    },
+    {
+      "name": "expanded3",
+      "value": false,
+      "on": [{ "events": { "type": "click", "markname": "toggle3" }, "update": "!expanded3" }]
+    },
+
+    {
+      "name": "hover",
+      "value": null,
       "on": [
         { "events": "text:mouseover", "update": "datum" },
         { "events": "text:mouseout", "update": "null" }
       ]
     },
-    { "name": "expanded1", "value": false,
-      "on": [ { "events": { "type": "click", "markname": "toggle1" }, "update": "!expanded1" } ]
-    },
-    { "name": "expanded2", "value": false,
-      "on": [ { "events": { "type": "click", "markname": "toggle2" }, "update": "!expanded2" } ]
-    },
-    { "name": "expanded3", "value": false,
-      "on": [ { "events": { "type": "click", "markname": "toggle3" }, "update": "!expanded3" } ]
-    },
 
-    // Calculate vertical offsets dynamically
-    { "name": "group1ItemCount", "update": "8" },
-    { "name": "group2ItemCount", "update": "4" },
-    { "name": "group3ItemCount", "update": "2" },
-    
-    { "name": "group1Height", "update": "expanded1 ? group1ItemCount * 30 : 0" },
-    { "name": "group2Y", "update": "40 + group1Height + 30" },
-    { "name": "group2Height", "update": "expanded2 ? group2ItemCount * 30 : 0" },
-    { "name": "group3Y", "update": "group2Y + group2Height + 30" }
+    { "name": "group1Count", "update": "8" },
+    { "name": "group2Count", "update": "4" },
+    { "name": "group3Count", "update": "2" },
+
+    { "name": "group1Height", "update": "expanded1 ? group1Count * 30 : 0" },
+    { "name": "group2Y", "update": "40 + group1Height" },
+    { "name": "group2Height", "update": "expanded2 ? group2Count * 30 : 0" },
+    { "name": "group3Y", "update": "group2Y + 30 + group2Height" }
   ],
 
   "data": [
@@ -264,44 +273,45 @@
   ],
 
   "marks": [
-    // Group 1 Header
     {
       "name": "toggle1",
       "type": "text",
       "encode": {
         "enter": {
-          "x": { "value": 0 },
+          "x": { "value": 10 },
           "y": { "value": 20 },
           "text": {
             "signal": "expanded1 ? '▼ Available Report Group 1' : '▶ Available Report Group 1'"
           },
           "fontSize": { "value": 16 },
           "fontWeight": { "value": "bold" },
-          "fill": { "value": "#333" },
+          "fill": { "value": "#000" },
           "cursor": { "value": "pointer" }
         }
       }
     },
-
-    // Group 1 Items
     {
       "type": "text",
       "from": {
         "data": "reports",
         "transform": [
           { "type": "filter", "expr": "datum.index <= 8 && expanded1" },
-          { "type": "formula", "as": "ypos", "expr": "(datum.index - 1) * 30 + 40" }
+          {
+            "type": "formula",
+            "as": "ypos",
+            "expr": "(datum.index - 1) * 30 + 40"
+          }
         ]
       },
       "encode": {
         "enter": {
-          "x": { "value": 10 },
+          "x": { "value": 20 },
           "y": { "field": "ypos" },
           "text": { "signal": "datum.index + '. ' + datum.label" },
           "href": { "signal": "baseUrl + datum.id" },
           "fontSize": { "value": 14 },
-          "baseline": { "value": "middle" },
-          "cursor": { "value": "pointer" }
+          "cursor": { "value": "pointer" },
+          "fill": { "value": "#1a73e8" }
         },
         "update": {
           "fill": {
@@ -314,44 +324,45 @@
       }
     },
 
-    // Group 2 Header
     {
       "name": "toggle2",
       "type": "text",
       "encode": {
         "enter": {
-          "x": { "value": 0 },
+          "x": { "value": 10 },
           "y": { "signal": "group2Y" },
           "text": {
             "signal": "expanded2 ? '▼ Available Report Group 2' : '▶ Available Report Group 2'"
           },
           "fontSize": { "value": 16 },
           "fontWeight": { "value": "bold" },
-          "fill": { "value": "#333" },
+          "fill": { "value": "#000" },
           "cursor": { "value": "pointer" }
         }
       }
     },
-
-    // Group 2 Items
     {
       "type": "text",
       "from": {
         "data": "reports",
         "transform": [
           { "type": "filter", "expr": "datum.index > 8 && datum.index <= 12 && expanded2" },
-          { "type": "formula", "as": "ypos", "expr": "(datum.index - 9) * 30 + group2Y + 20" }
+          {
+            "type": "formula",
+            "as": "ypos",
+            "expr": "(datum.index - 9) * 30 + group2Y + 20"
+          }
         ]
       },
       "encode": {
         "enter": {
-          "x": { "value": 10 },
+          "x": { "value": 20 },
           "y": { "field": "ypos" },
           "text": { "signal": "datum.index + '. ' + datum.label" },
           "href": { "signal": "baseUrl + datum.id" },
           "fontSize": { "value": 14 },
-          "baseline": { "value": "middle" },
-          "cursor": { "value": "pointer" }
+          "cursor": { "value": "pointer" },
+          "fill": { "value": "#1a73e8" }
         },
         "update": {
           "fill": {
@@ -364,44 +375,45 @@
       }
     },
 
-    // Group 3 Header
     {
       "name": "toggle3",
       "type": "text",
       "encode": {
         "enter": {
-          "x": { "value": 0 },
+          "x": { "value": 10 },
           "y": { "signal": "group3Y" },
           "text": {
             "signal": "expanded3 ? '▼ Available Report Group 3' : '▶ Available Report Group 3'"
           },
           "fontSize": { "value": 16 },
           "fontWeight": { "value": "bold" },
-          "fill": { "value": "#333" },
+          "fill": { "value": "#000" },
           "cursor": { "value": "pointer" }
         }
       }
     },
-
-    // Group 3 Items
     {
       "type": "text",
       "from": {
         "data": "reports",
         "transform": [
           { "type": "filter", "expr": "datum.index > 12 && expanded3" },
-          { "type": "formula", "as": "ypos", "expr": "(datum.index - 13) * 30 + group3Y + 20" }
+          {
+            "type": "formula",
+            "as": "ypos",
+            "expr": "(datum.index - 13) * 30 + group3Y + 20"
+          }
         ]
       },
       "encode": {
         "enter": {
-          "x": { "value": 10 },
+          "x": { "value": 20 },
           "y": { "field": "ypos" },
           "text": { "signal": "datum.index + '. ' + datum.label" },
           "href": { "signal": "baseUrl + datum.id" },
           "fontSize": { "value": 14 },
-          "baseline": { "value": "middle" },
-          "cursor": { "value": "pointer" }
+          "cursor": { "value": "pointer" },
+          "fill": { "value": "#1a73e8" }
         },
         "update": {
           "fill": {
@@ -415,4 +427,3 @@
     }
   ]
 }
-
