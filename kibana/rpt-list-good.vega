@@ -1,0 +1,84 @@
+{
+  "$schema": "https://vega.github.io/schema/vega/v5.json",
+  "description": "Report Dashboard Links with Dynamic Base URL",
+  "autosize": "none",
+  "width": 400,
+  "height": 450,
+  "padding": 10,
+
+  "signals": [
+    {
+      "name": "baseUrl",
+      "value": "https://nsas-pst-01-kibana.nsas.cnx.tnet.att.com/s/elnas/app/dashboards#/view/"
+    },
+    {
+      "name": "hover",
+      "value": null,
+      "on": [
+        {"events": "text:mouseover", "update": "datum"},
+        {"events": "text:mouseout", "update": "null"}
+      ]
+    }
+  ],
+
+  "data": [
+    {
+      "name": "reports",
+      "values": [
+        {"id": "2b40f4b6-f3cf-4f31-8e00-d4b71fa344c9", "label": "Alarm_Message - eventType(1, 2, 3)", "ypos": 30},
+        {"id": "repor2-dashboard-id", "label": "Alarm_Environment_Message — eventType(4, 5)", "ypos": 60},
+        {"id": "repor3-dashboard-id", "label": "AlarmDetail — eventType(6)", "ypos": 90},
+        {"id": "repor4-dashboard-id", "label": "autoTrunkTestAlarm — eventType(7)", "ypos": 120},
+        {"id": "repor5-dashboard-id", "label": "SbackUpAlarm — eventType(9)", "ypos": 150},
+        {"id": "repor6-dashboard-id", "label": "reportCondition — eventType(10)", "ypos": 180},
+        {"id": "repor7-dashboard-id", "label": "diagnosticAlarm — eventType(11)", "ypos": 210},
+        {"id": "repor8-dashboard-id", "label": "diagnosticAlarmDetails — eventType(12)", "ypos": 240},
+        {"id": "repor9-dashboard-id", "label": "eventAlarm — eventType(13)", "ypos": 270},
+        {"id": "repor10-dashboard-id", "label": "exerciseAlarm — eventType(14)", "ypos": 300},
+        {"id": "repor11-dashboard-id", "label": "removalAlarm and restorationAlarm — eventType(18, 19)", "ypos": 330},
+        {"id": "repor12-dashboard-id", "label": "removalAlarm or restorationAlarm — eventType(20)", "ypos": 360},
+        {"id": "repor13-dashboard-id", "label": "more report", "ypos": 390},
+        {"id": "repor14-dashboard-id", "label": "more report", "ypos": 420}
+
+      ],
+      "transform": [
+        {
+          "type": "window",
+          "ops": ["rank"],
+          "as": ["index"]
+        },
+        {
+          "type": "formula",
+          "as": "ypos",
+          "expr": "(datum.index - 1) * 30 + 10"
+        }
+      ]
+    }
+  ],
+
+  "marks": [
+    {
+      "type": "text",
+      "from": {"data": "reports"},
+      "encode": {
+        "enter": {
+          "x": {"value": 0},
+          "y": {"field": "ypos"},
+          "text": {"signal": "datum.index + '. ' + datum.label"},
+          "href": {"signal": "baseUrl + datum.id"},
+          "fontSize": {"value": 14},
+          "baseline": {"value": "middle"},
+          "cursor": {"value": "pointer"}
+        },
+        "update": {
+          "fill": {
+            "signal": "hover && hover.id === datum.id ? '#2558d9' : '#1a73e8'"
+          },
+          "fontWeight": {
+            "signal": "hover && hover.id === datum.id ? 'bold' : 'normal'"
+          }
+        }
+      }
+    }
+  ]
+}
