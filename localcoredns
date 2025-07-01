@@ -1,0 +1,21 @@
+ k -n kube-system logs pods/nodelocaldns-xx7lv
+2025/07/01 18:30:51 [INFO] Starting node-cache image: 1.22.28
+2025/07/01 18:30:51 [INFO] Using Corefile /etc/coredns/Corefile
+2025/07/01 18:30:51 [INFO] Using Pidfile
+2025/07/01 18:30:51 [ERROR] Failed to read node-cache coreFile /etc/coredns/Corefile.base - open /etc/coredns/Corefile.base: no such file or directory
+2025/07/01 18:30:51 [INFO] Skipping kube-dns configmap sync as no directory was specified
+.:53 on 169.254.25.10
+cluster.local.:53 on 169.254.25.10
+in-addr.arpa.:53 on 169.254.25.10
+ip6.arpa.:53 on 169.254.25.10
+[INFO] plugin/reload: Running configuration SHA512 = aa809f767f97014677c4e010f69a19281bea2a25fd44a8c9172f6f43db27a70080deb3a2add822c680f580337da221a7360acac898a1e8a8827a7bda80e00c2d
+CoreDNS-1.10.0
+linux/amd64, go1.21.4,
+[ERROR] plugin/errors: 2 5011740404989499688.2006470830334988746. HINFO: read udp 169.254.25.10:36396->169.254.25.10:53: i/o timeout
+[ERROR] plugin/errors: 2 . NS: read udp 32.111.223.133:43266->135.21.13.15:53: i/o timeout
+[ERROR] plugin/errors: 2 . NS: read udp 169.254.25.10:58880->169.254.25.10:53: i/o timeout
+[ERROR] plugin/errors: 2 . NS: read udp 32.111.223.133:42745->135.21.13.22:53: i/o timeout
+[ERROR] plugin/errors: 2 5011740404989499688.2006470830334988746. HINFO: read udp 169.254.25.10:55737->169.254.25.10:53: i/o timeout
+[FATAL] plugin/loop: Loop (169.254.25.10:54223 -> 169.254.25.10:53) detected for zone ".", see https://coredns.io/plugins/loop#troubleshooting. Query: "HINFO 5011740404989499688.2006470830334988746."
+sb821u@mtrn4601ncmd01:~$
+ 
