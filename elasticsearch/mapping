@@ -5,3 +5,6 @@
 
 summary of the issue
 for my use case, the ingest source is fluentd, most of logs have [kubernetes.labels.app] object, but very a few logs have [kubernetes.labels.app] concrete value, how to resolve following issue in elasticsearch index mapping "[error type]: document_parsing_exception [reason]: '[1:295] object mapping for [kubernetes.labels.app] tried to parse field [app] as object, but found a concrete value'  "kubernetes"=>{"labels"=>{"app"=>"tick-vcc-sub-mobnok-sam",..}"
+
+
+the Elasticsearch mapping conflict for kubernetes.labels.app in Fluentd-to-Elasticsearch pipeline—where most logs have this field as an object but a few send it as a string
