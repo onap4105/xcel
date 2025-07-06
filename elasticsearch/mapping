@@ -8,3 +8,12 @@ for my use case, the ingest source is fluentd, most of logs have [kubernetes.lab
 
 
 the Elasticsearch mapping conflict for kubernetes.labels.app in Fluentd-to-Elasticsearch pipeline—where most logs have this field as an object but a few send it as a string
+
+
+You're using Fluentd as the log shipper
+
+Most logs have kubernetes.labels.app as an object
+
+A few logs incorrectly have kubernetes.labels.app as a string
+
+Elasticsearch throws a mapping conflict because it cannot store both an object and a concrete value under the same field
