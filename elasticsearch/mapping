@@ -17,3 +17,80 @@ Most logs have kubernetes.labels.app as an object
 A few logs incorrectly have kubernetes.labels.app as a string
 
 Elasticsearch throws a mapping conflict because it cannot store both an object and a concrete value under the same field
+
+Full Fluentd Solution Using Lua Filter
+🔹 Step 1: Install Lua Plugin
+Install the Lua plugin for Fluentd (if not already installed):
+
+fluent-gem install fluent-plugin-lua
+🔹 Step 2: Add a Lua Filter to Your Fluentd Config
+Add this block to your Fluentd configuration (fluent.conf or td-agent.conf):
+
+conf
+<filter **>
+  @type lua
+  script /etc/fluentd/filter_k8s_app.lua
+  call filter_app
+</filter>
+
+🔹 Step 3: Create Lua Script /etc/fluentd/filter_k8s_app.lua
+Create this file with the following contents:
+
+lua
+function filter_app(tag, timestamp, record)
+  local kubernetes = record["kubernetes"]
+  if kubernetes == nil then
+    return 1, timestamp, record
+  end
+
+  local labels = kubernetes["labels"]
+  if labels == nil then
+    return 1, timestamp, record
+  end
+
+  local app = labels["app"]
+  -- Convert string to object { "value": "string" }
+  if type(app) == "string" then
+    labels["app"] = { value = app }  -- Preserve field name!
+  end
+  -- If app is already an object, leave it unchanged
+
+  return 1, timestamp, record
+end
+
+Key Changes:
+No field renaming: Keeps data in kubernetes.labels.app for all logs.
+
+Unified structure: All values become objects (e.g., "app": {"value": "tick-vcc..."}).
+
+Backward-compatible queries: Search using kubernetes.labels.app.value works universally.
+
+1. Existing Queries Need to Change
+If any tooling or saved dashboards currently query:
+
+kubernetes.labels.app: "tick-vcc-sub-mobnok-sam"
+They'll need to be updated to:
+
+kubernetes.labels.app.value: "tick-vcc-sub-mobnok-sam"
+
+2. Adds Structural Overhead
+For logs where app was a plain string, now you store:
+
+"app": { "value": "tick-vcc-sub-mobnok-sam" }
+
+3. Elasticsearch Mapping Needs to Support Nested Field
+Make sure app is mapped like this in Elasticsearch:
+
+"kubernetes": {
+  "properties": {
+    "labels": {
+      "properties": {
+        "app": {
+          "properties": {
+            "value": { "type": "keyword" }
+          }
+        }
+      }
+    }
+  }
+}
