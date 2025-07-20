@@ -1,0 +1,94 @@
+fluentbit collects logs and forwards to fluentd, then fluentd forwards all logs to elasticsearch, elasticsearch  generates a new index daily with index conflicts 
+due to kubernetes.labels.app vs kubernetes.labels.app.kubernetes.io/example, what is a good solution for this issue 
+
+chatgpt
+========
+function fix_labels(tag, timestamp, record)
+    if record.kubernetes ~= nil 
+       and type(record.kubernetes.labels) == "table"
+       and record.kubernetes.labels.app ~= nil 
+    then
+        -- Only set if not already present
+        if record.kubernetes.labels.app_value == nil then
+            record.kubernetes.labels.app_value = record.kubernetes.labels.app
+        end
+
+        -- Remove conflicting field
+        record.kubernetes.labels.app = nil
+    end
+
+    return 1, timestamp, record
+end
+
+deepseek
+========
+function fix_labels(tag, timestamp, record)
+    if record.kubernetes ~= nil 
+       and record.kubernetes.labels ~= nil 
+       and record.kubernetes.labels.app ~= nil 
+    then
+        -- 1. Create new field
+        record.kubernetes.labels.app_value = record.kubernetes.labels.app
+        
+        -- 2. CRITICAL: Remove original field
+        record.kubernetes.labels.app = nil
+    end
+    return 1, timestamp, record
+end
+
+deepseek v2
+=================
+function fix_labels(tag, timestamp, record)
+    -- Validate structure
+    if record.kubernetes == nil 
+       or type(record.kubernetes) ~= "table"
+       or record.kubernetes.labels == nil 
+       or type(record.kubernetes.labels) ~= "table"
+       or record.kubernetes.labels.app == nil 
+       or type(record.kubernetes.labels.app) ~= "string"  -- Ensure app is string
+    then
+        return 1, timestamp, record
+    end
+
+    local labels = record.kubernetes.labels
+    
+    -- Only modify if app_value doesn't exist OR is same type
+    if labels.app_value == nil 
+       or type(labels.app_value) == type(labels.app) 
+    then
+        labels.app_value = labels.app
+    end
+    
+    -- Always remove conflicting field
+    labels.app = nil
+    
+    return 1, timestamp, record
+end
+
+deepseek v3
+===========
+function fix_labels(tag, timestamp, record)
+    local labels = record.kubernetes and record.kubernetes.labels
+    -- Exit early if no valid labels table
+    if type(labels) ~= "table" then
+        return 1, timestamp, record
+    end
+
+    local app = labels.app
+    -- Only process if app exists and is string
+    if type(app) ~= "string" or app == "" then
+        return 1, timestamp, record
+    end
+
+    -- Preserve existing app_value if present and same type
+    if labels.app_value == nil then
+        labels.app_value = app
+    elseif type(labels.app_value) ~= "string" then
+        labels.app_value = app  -- Force consistent type
+    end
+
+    -- Always remove conflicting field
+    labels.app = nil
+
+    return 1, timestamp, record
+end
