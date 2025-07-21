@@ -1,0 +1,128 @@
+Below is how the lua script is defined and used, seems I just need to create a lua script in configmap and use the script the same way as th eexamples, correct? I do not see volume and volumemount in the fluentbit pod.
+
+# kubectl get cm -n fluentbit fluent-bit-containerd-config -o yaml
+apiVersion: v1
+data:
+  containerd.lua: |
+    function containerd( tag, timestamp, record)
+           if(record["logtag"]~=nil)
+           then
+           timeStr = os.date("!*t",  timestamp["sec"])
+            t = string.format("%4d-%02d-%02dT%02d:%02d:%02d.%sZ",
+            timeStr["year"], timeStr["month"], timeStr["day"],
+            timeStr["hour"], timeStr["min"], timeStr["sec"],
+            timestamp["nsec"]);
+            record["time"] = t;
+            record["log"] = record["message"];
+            record["message"] =  nil;
+            return 1, timestamp, record
+            else
+            return 0,timestamp,record
+           end
+    end
+kind: ConfigMap
+metadata:
+  annotations:
+    meta.helm.sh/release-name: fluent-operator
+    meta.helm.sh/release-namespace: fluentbit
+  creationTimestamp: "2025-05-26T15:05:36Z"
+  labels:
+    app.kubernetes.io/managed-by: Helm
+  name: fluent-bit-containerd-config
+  namespace: fluentbit
+  resourceVersion: "6288319"
+  uid: 29614897-b8c4-42f3-93e1-2a4a530c22ba
+
+=================================================
+
+# kubectl get cm -n fluentbit fluent-bit-lua -o yaml
+apiVersion: v1
+data:
+  systemd.lua: |
+    function add_time(tag, timestamp, record)
+      new_record = {}
+
+      timeStr = os.date("!*t", timestamp["sec"])
+      t = string.format("%4d-%02d-%02dT%02d:%02d:%02d.%sZ",
+      timeStr["year"], timeStr["month"], timeStr["day"],
+      timeStr["hour"], timeStr["min"], timeStr["sec"],
+      timestamp["nsec"])
+
+      kubernetes = {}
+      kubernetes["pod_name"] = record["_HOSTNAME"]
+      kubernetes["container_name"] = record["SYSLOG_IDENTIFIER"]
+      kubernetes["namespace_name"] = "kube-system"
+
+      new_record["time"] = t
+      new_record["log"] = record["MESSAGE"]
+      new_record["kubernetes"] = kubernetes
+
+      return 1, timestamp, new_record
+    end
+kind: ConfigMap
+metadata:
+  annotations:
+    meta.helm.sh/release-name: fluent-operator
+    meta.helm.sh/release-namespace: fluentbit
+  creationTimestamp: "2025-05-26T15:05:36Z"
+  labels:
+    app.kubernetes.io/managed-by: Helm
+  name: fluent-bit-lua
+  namespace: fluentbit
+  resourceVersion: "6288321"
+  uid: 9dea9cd0-d032-440b-8c24-fe69c4226324
+
+
+# kubectl get clusterfilters.fluentbit.fluent.io -n fluentbit containerd -o yaml
+apiVersion: fluentbit.fluent.io/v1alpha2
+kind: ClusterFilter
+metadata:
+  annotations:
+    meta.helm.sh/release-name: fluent-operator
+    meta.helm.sh/release-namespace: fluentbit
+  creationTimestamp: "2025-05-26T15:05:37Z"
+  generation: 1
+  labels:
+    app.kubernetes.io/managed-by: Helm
+    fluentbit.fluent.io/component: logging
+    fluentbit.fluent.io/enabled: "true"
+  name: containerd
+  resourceVersion: "6288347"
+  uid: bce19dae-e56b-4395-ab3e-b6cb26209adf
+spec:
+  filters:
+  - lua:
+      call: containerd
+      script:
+        key: containerd.lua
+        name: fluent-bit-containerd-config
+      timeAsTable: true
+  match: kube.*
+
+============================================
+
+# kubectl get clusterfilters.fluentbit.fluent.io -n fluentbit systemd -o yaml
+apiVersion: fluentbit.fluent.io/v1alpha2
+kind: ClusterFilter
+metadata:
+  annotations:
+    meta.helm.sh/release-name: fluent-operator
+    meta.helm.sh/release-namespace: fluentbit
+  creationTimestamp: "2025-05-26T15:05:37Z"
+  generation: 1
+  labels:
+    app.kubernetes.io/managed-by: Helm
+    fluentbit.fluent.io/component: logging
+    fluentbit.fluent.io/enabled: "true"
+  name: systemd
+  resourceVersion: "6288353"
+  uid: 3ff27f83-02f9-4b3a-8096-e60c74a089cc
+spec:
+  filters:
+  - lua:
+      call: add_time
+      script:
+        key: systemd.lua
+        name: fluent-bit-lua
+      timeAsTable: true
+  match: service.*
