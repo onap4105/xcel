@@ -92,3 +92,45 @@ function fix_labels(tag, timestamp, record)
 
     return 1, timestamp, record
 end
+
+chatgpt v2
+===========
+function fix_labels(tag, timestamp, record)
+    local labels = record.kubernetes and record.kubernetes.labels
+    -- Exit early if no valid labels table
+    if type(labels) ~= "table" then
+        return 1, timestamp, record
+    end
+
+    local app = labels.app
+    -- Only process if app exists and is string
+    if type(app) ~= "string" or app == "" then
+        return 1, timestamp, record
+    end
+
+    -- Replace with structured object: app = { value = "..." }
+    labels.app = { value = app }
+
+    return 1, timestamp, record
+end
+
+deepseek v4
+=================
+function fix_labels(tag, timestamp, record)
+    local labels = record.kubernetes and record.kubernetes.labels
+    -- Exit early if no valid labels table
+    if type(labels) ~= "table" then
+        return 1, timestamp, record
+    end
+
+    local app = labels.app
+    -- Only process if app exists and is string
+    if type(app) ~= "string" or app == "" then
+        return 1, timestamp, record
+    end
+
+    -- Convert to nested structure: { app = { value = "original_value" } }
+    labels.app = { value = app }
+
+    return 1, timestamp, record
+end
