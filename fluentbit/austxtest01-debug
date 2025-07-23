@@ -1,0 +1,56 @@
+I am getting lots of warning logs as below with below fluentd configuration, any suggestions? 
+2025-07-23 11:16:51 +0000 [warn]: #0 [ClusterFluentdConfig-cluster-fluentd-config::cluster::clusteroutput::fluentd-output-es-s1-0] buffer flush took longer time than slow_flush_log_threshold: elapsed_time=23.626952380873263 slow_flush_log_threshold=20.0 plugin_id="ClusterFluentdConfig-cluster-fluentd-config::cluster::clusteroutput::fluentd-output-es-s1-0"
+
+<source>
+  @type  forward
+  bind  0.0.0.0
+  port  24224
+</source>
+<match **>
+  @id  main
+  @type  label_router
+  <route>
+    @label  @db681e4cb763ca5b7cdbf9ab76f67bbe
+    <match>
+      namespaces
+    </match>
+  </route>
+</match>
+<label @db681e4cb763ca5b7cdbf9ab76f67bbe>
+  <match **>
+    @id  ClusterFluentdConfig-cluster-fluentd-config::cluster::clusteroutput::fluentd-output-es-copy-0
+    @type  copy
+    copy_mode  no_copy
+    <store>
+      @id  ClusterFluentdConfig-cluster-fluentd-config::cluster::clusteroutput::fluentd-output-es-s1-0
+      @type  elasticsearch
+      host  ndcu-elastic-oss-mtrn4-test-01.dcu.idns.aic.cip.att.com
+      log_es_400_reason  true
+      logstash_format  true
+      logstash_prefix  ks-austxtest01-log
+      password  elastic@dcunprd2024
+      port  30199
+      reconnect_on_error  true
+      reload_connections  false
+      reload_on_failure  true
+      request_timeout  120s
+      scheme  https
+      ssl_verify  false
+      suppress_type_name  true
+      user  elastic
+      <buffer>
+        @type  file
+        chunk_limit_size  1MB
+        compress  gzip
+        flush_interval  5s
+        flush_mode  interval
+        flush_thread_count  4
+        overflow_action  block
+        path  /buffers/es1
+        retry_max_times  2
+        retry_timeout  30s
+        total_limit_size  18GB
+      </buffer>
+    </store>
+  </match>
+</label>
