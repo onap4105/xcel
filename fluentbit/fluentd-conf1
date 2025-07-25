@@ -155,3 +155,119 @@ clusterInputs:
 > kubectl exec <fluentd-pod> -- sh -c "apt update && apt install -y mtr iperf3"
 > kubectl exec <fluentd-pod> -- iperf3 -c aaa.bbb.com -p 30199 -t 30
 > ```
+
+====================================================             
+To optimize your Fluentd-to-Elasticsearch cross-network performance in the Fluent Operator Helm chart, configure these key parameters in your `values.yaml`:
+
+### 1. **Critical Elasticsearch Output Tuning**
+```yaml
+clusterOutput:
+  enabled: true
+  outputs:
+    - elasticsearch:
+        host: "aaa.bbb.com"
+        port: 30199
+        scheme: https
+        user: elastic
+        password: xxxxxxx
+        logstashFormat: true
+        logstashPrefix: "ks-au-log"
+        
+        # NETWORK/PERFORMANCE PARAMETERS
+        requestTimeout: 300s     # Increased from 150s
+        compressConnection: true # Enable gzip compression
+        reloadConnections: false
+        reloadOnFailure: true
+        reconnectOnError: true
+        slowFlushLogThreshold: 60.0  # Warn if flushes take >60s
+        
+        # BUFFER TUNING
+        buffer:
+          type: file
+          path: /buffers/es1
+          chunkLimitSize: 20MB   # CRITICAL: Increased from 1MB
+          totalLimitSize: 28GB
+          compress: gzip
+          flushInterval: 30s     # Reduced frequency (was 5s)
+          flushMode: interval
+          flushThreadCount: 8    # Increased parallelism
+          retryTimeout: 3600s    # Longer retry window (was 30s)
+          retryMaxTimes: 10      # Increased retry attempts
+          overflowAction: block
+```
+
+### 2. **Additional Fluentd DaemonSet Tuning**
+```yaml
+fluentd:
+  resources:
+    limits:
+      memory: 4Gi   # Ensure enough memory for larger buffers
+    requests:
+      cpu: 1000m
+      memory: 2Gi
+
+  # NETWORK KERNEL PARAMETERS (for high-latency networks)
+  podAnnotations:
+    tuning.fluentd.operator/network: "high-latency"
+  
+  # OPTIONAL: Add custom env variables for TCP tuning
+  extraEnvVars:
+    - name: FLUENTD_OPT
+      value: "--no-supervisor -qq"  # Reduce verbosity
+    - name: NET_IPV4_TCP_WMEM
+      value: "4096 16384 4194304"   # Increase TCP write buffers
+```
+
+### 3. **Deployment Notes**
+1. **Apply the changes**:
+   ```bash
+   helm upgrade fluent-operator -f values.yaml fluent/fluent-operator
+   ```
+
+2. **Verify configuration** in Fluentd pods:
+   ```bash
+   kubectl exec <fluentd-pod> -- cat /fluentd/etc/output.conf | grep -E 'chunk|flush|retry|compress'
+   ```
+
+### Key Optimizations Explained:
+| **Parameter** | **Original** | **Optimized** | **Why** |
+|---------------|--------------|---------------|---------|
+| `chunkLimitSize` | 1MB | 20MB | Reduces round trips for high-latency networks |
+| `flushInterval` | 5s | 30s | Fewer frequent flushes = fewer network calls |
+| `compressConnection` | disabled | `true` | Reduces payload size by 70-90% |
+| `flushThreadCount` | 4 | 8 | Better parallelization |
+| `retryTimeout` | 30s | 3600s | Prevents data loss during network blips |
+| `slowFlushLogThreshold` | Not set | 60.0 | Alerts on slow operations |
+
+### If Still Slow: Architecture Change
+Add a **forwarder tier** in the source network:
+```yaml
+# values.yaml (source cluster)
+clusterOutput:
+  outputs:
+    - forward:
+        servers:
+          - host: "aggregator.central.net"
+            port: 24224
+        buffer:
+          chunkLimitSize: 50MB
+          compress: gzip
+
+# Central cluster aggregator
+clusterInput:
+  inputs:
+    - forward:
+        bind: 0.0.0.0
+        port: 24224
+```
+
+### Monitoring Commands:
+```bash
+# Check buffer backpressure
+kubectl exec <fluentd-pod> -- curl -s http://localhost:24220/api/plugins.json | jq '.plugins[] | select(.type=="output")'
+
+# Network performance test
+kubectl exec <fluentd-pod> -- iperf3 -c aaa.bbb.com -p 30199 -t 10
+```
+
+> **Important**: Always test buffer directory performance (`/buffers/es1`) using `fio` tests to ensure disk can handle the increased chunk sizes. Cross-network transfers require balancing between chunk size, compression, and flush frequency.
