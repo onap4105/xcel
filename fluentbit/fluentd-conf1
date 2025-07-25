@@ -1,0 +1,157 @@
+To configure `slow_flush_log_threshold` and other performance parameters in **Fluent Operator**, you need to use the correct YAML structure since it's not directly exposed in the standard Helm values. Here's how to implement it:
+
+### 1. Correct Configuration for `slow_flush_log_threshold`
+Add it under `parameters` in your ClusterOutput definition:
+
+```yaml
+clusterOutputs:
+  - name: es-output
+    spec:
+      elasticsearch:
+        host: "aaa.bbb.com"
+        port: 30199
+        # ... other standard params ...
+        parameters:  # <-- Custom plugin parameters
+          - name: slow_flush_log_threshold
+            value: "60.0"
+          - name: delay_commit_timeout
+            value: "30s"
+```
+
+### 2. Full Optimized Configuration
+```yaml
+# values.yaml
+clusterOutputs:
+  - name: es-output
+    spec:
+      elasticsearch:
+        host: "aaa.bbb.com"
+        port: 30199
+        scheme: https
+        user: elastic
+        password: "xxxxxxx"
+        logstashFormat: true
+        logstashPrefix: "ks-au-log"
+        sslVerify: false
+        suppressTypeName: true
+        reconnectOnError: true
+        reloadOnFailure: true
+        reloadConnections: false
+        requestTimeout: "300s"
+        compressConnection: true  # Enable gzip
+        
+        # Custom parameters
+        parameters:
+          - name: slow_flush_log_threshold
+            value: "60.0"
+          - name: delay_commit_timeout
+            value: "30s"
+        
+        # Buffer configuration
+        buffer:
+          type: file
+          path: /buffers/es1
+          chunkLimitSize: "20MB"  # Critical!
+          totalLimitSize: "28GB"
+          compress: gzip
+          flushInterval: "30s"
+          flushMode: interval
+          flushThreadCount: 8
+          retryTimeout: "3600s"
+          retryMaxTimes: 10
+          overflowAction: block
+
+# DaemonSet resources
+fluentd:
+  resources:
+    limits:
+      memory: "4Gi"
+    requests:
+      cpu: "1000m"
+      memory: "2Gi"
+
+# Optional: TCP kernel tuning
+extraVolumes:
+  - name: sysctl
+    hostPath:
+      path: /etc/sysctl.d
+extraVolumeMounts:
+  - name: sysctl
+    mountPath: /etc/sysctl.d
+extraEnvVars:
+  - name: NET_IPV4_TCP_WMEM
+    value: "4096 16384 4194304"
+```
+
+### 3. Verification Steps
+After deploying:
+```bash
+# Check if parameters were injected
+kubectl exec <fluentd-pod> -- grep 'slow_flush_log_threshold' /fluentd/etc/output.conf
+
+# Expected output:
+#   slow_flush_log_threshold 60.0
+#   delay_commit_timeout 30s
+
+# Monitor flush times
+kubectl logs <fluentd-pod> | grep 'flush took longer than'
+```
+
+### Key Notes:
+1. **Operator-Specific Syntax**:
+   - Fluent Operator uses `parameters` array for non-standard settings
+   - Format must be `name`/`value` pairs (values as strings)
+
+2. **Buffer Directory**:
+   Ensure persistent storage for buffers:
+   ```yaml
+   fluentd:
+     buffers:
+       es1:
+         mountPath: /buffers/es1
+         hostPath:
+           path: /mnt/fluentd/buffers
+   ```
+
+3. **If parameters don't work** (Operator version <1.3), use custom template:
+   ```yaml
+   clusterOutputs:
+     - name: es-output
+       template: |
+         <store>
+           @type elasticsearch
+           # ...
+           slow_flush_log_threshold 60.0
+           delay_commit_timeout 30s
+         </store>
+   ```
+
+### Alternative: Forwarder Architecture
+For severe network limitations:
+```yaml
+# Source cluster (log producer)
+clusterOutputs:
+  - name: forward-to-aggregator
+    spec:
+      forward:
+        servers:
+          - host: "aggregator.central.net"
+            port: 24224
+        buffer:
+          chunkLimitSize: "50MB"
+          compress: gzip
+
+# Central aggregator cluster
+clusterInputs:
+  - name: aggregator-input
+    spec:
+      forward:
+        bind: "0.0.0.0"
+        port: 24224
+```
+
+> **Troubleshooting Tip**: If ingestion still lags, run network tests from within the pod:
+> ```bash
+> kubectl exec <fluentd-pod> -- sh -c "apt update && apt install -y mtr iperf3"
+> kubectl exec <fluentd-pod> -- iperf3 -c aaa.bbb.com -p 30199 -t 30
+> ```
