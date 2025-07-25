@@ -271,3 +271,138 @@ kubectl exec <fluentd-pod> -- iperf3 -c aaa.bbb.com -p 30199 -t 10
 ```
 
 > **Important**: Always test buffer directory performance (`/buffers/es1`) using `fio` tests to ensure disk can handle the increased chunk sizes. Cross-network transfers require balancing between chunk size, compression, and flush frequency.
+=================================================================
+The warnings confirm that flushing buffers to Elasticsearch is extremely slow (over 3 minutes per flush), far exceeding your `slow_flush_log_threshold=20s`. Here's a targeted action plan to resolve this:
+
+### Critical Fixes to Implement Immediately
+1. **Increase Chunk Size** (Most urgent):
+   ```yaml
+   buffer:
+     chunkLimitSize: "50MB"  # Minimum for cross-network (was 1MB/20MB)
+   ```
+
+2. **Enable Compression** (If not already):
+   ```yaml
+   elasticsearch:
+     compressConnection: true
+   ```
+
+3. **Adjust Flush Parameters**:
+   ```yaml
+   buffer:
+     flushInterval: "60s"    # Reduce flush frequency
+     flushThreadCount: 16     # Increase parallelism
+   ```
+
+### Network-Specific Optimizations
+4. **TCP Kernel Tuning** (Add to Fluentd pods):
+   ```yaml
+   # In your Helm values.yaml
+   fluentd:
+     podAnnotations:
+       sysctls.fluentd/tcp-tuning: "true"
+     securityContext:
+       sysctls:
+         - name: net.ipv4.tcp_window_scaling
+           value: "1"
+         - name: net.ipv4.tcp_rmem
+           value: "4096 87380 16777216"
+         - name: net.ipv4.tcp_wmem
+           value: "4096 16384 16777216"
+   ```
+
+5. **Elasticsearch Bulk Processing Tuning**:
+   ```yaml
+   # Add to elasticsearch.yml
+   thread_pool.bulk.queue_size: 5000  # Default 200
+   thread_pool.bulk.size: 32          # Default # of cores
+   ```
+
+### Diagnostic Commands to Run
+**1. Network Quality Test**:
+```bash
+kubectl exec <fluentd-pod> -- sh -c "apt update && apt install -y mtr && mtr --report-wide --tcp --port 30199 aaa.bbb.com"
+```
+
+**2. Check Actual Payload Size**:
+```bash
+kubectl exec <fluentd-pod> -- sh -c "ls -lh /buffers/es1 | grep -E 'buffer|\.log'"
+# Look for chunk files much smaller than 50MB
+```
+
+**3. Measure ES Response Time**:
+```bash
+kubectl exec <fluentd-pod> -- curl -w '\nTotal time: %{time_total}s\n' \
+  -u elastic:xxxxxxx -k -X POST "https://aaa.bbb.com:30199/_bulk?pretty" \
+  -H "Content-Type: application/x-ndjson" \
+  --data-binary @/path/to/chunk.buffer
+```
+
+### Final Emergency Configuration
+```yaml
+clusterOutputs:
+  - name: es-output
+    spec:
+      elasticsearch:
+        # ... existing config ...
+        requestTimeout: "600s"  # Double timeout
+        parameters:
+          - name: slow_flush_log_threshold
+            value: "300.0"     # Temporary suppress warnings
+          - name: delay_commit_timeout
+            value: "120s"
+          - name: chunk_bytes_limit
+            value: "50m"       # Force 50MB chunks
+      buffer:
+        chunkLimitSize: "50MB"
+        flushInterval: "60s"
+        flushThreadCount: 16
+        retryTimeout: "7200s"   # 2-hour retry window
+        retryMaxTimes: 30
+```
+
+### If Still Failing: Workaround Architecture
+Deploy a **network-optimized forwarder** near Elasticsearch:
+```yaml
+# values.yaml (log producer cluster)
+clusterOutputs:
+  - name: forward-to-aggregator
+    spec:
+      forward:
+        servers:
+          - host: "fluentd-aggregator.near-es.svc"
+            port: 24224
+        buffer:
+          chunkLimitSize: "100MB"
+          compress: gzip
+          flushInterval: "1s"  # Fast local flush
+
+# Aggregator cluster (in same network as ES)
+clusterInputs:
+  - name: aggregator-input
+    spec:
+      forward:
+        bind: "0.0.0.0"
+        port: 24224
+
+clusterOutputs:
+  - name: es-output
+    spec:
+      elasticsearch:
+        host: "localhost"  # Same network!
+        port: 9200
+        buffer:
+          chunkLimitSize: "50MB"
+          flushInterval: "30s"
+```
+
+### Key Metrics to Monitor
+```bash
+# Inside Fluentd pod
+watch -n 5 "ls -lh /buffers/es1 | grep buffer"
+
+# Elasticsearch bulk stats
+curl -s -u elastic:xxxxxxx "https://aaa.bbb.com:30199/_nodes/stats/thread_pool?filter_path=**.bulk"
+```
+
+The 3+ minute flushes indicate either severe network constraints or undersized resources. Start with 50MB chunks + compression, and if that doesn't cut flush times below 60s, implement the forwarding architecture.
