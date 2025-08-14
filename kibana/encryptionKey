@@ -1,0 +1,103 @@
+---
+elasticsearchHosts: "https://elasticsearch-oss-master:9200"
+
+# Extra environment variables to append to this nodeGroup
+# This will be appended to the current 'env:' key. You can use any of the kubernetes env
+# syntax here
+extraEnvs:
+  - name: POD_NAME
+    valueFrom:
+      fieldRef:
+        fieldPath: metadata.name
+  - name: "NODE_OPTIONS"
+    value: "--max-old-space-size=1800"
+  - name: ELASTICSEARCH_USERNAME
+    value: "kibana_system"
+  - name: ELASTICSEARCH_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: elk-vault
+        key: oss.admin.password
+  - name: MONITOR_USERNAME
+    valueFrom:
+      secretKeyRef:
+        name: elk-vault
+        key: oss.admin.user
+  - name: MONITOR_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: elk-vault
+        key: oss.admin.password
+  - name: MONITOR_OUTPUT_USERNAME
+    value: "remote_monitoring_user"
+
+output:
+  hosts: ["https://elasticsearch-oss-master:9200"]
+  username: ${MONITOR_OUTPUT_USERNAME}
+  password: ${MONITOR_PASSWORD}
+
+kibana:
+  host: "https://elk-kibana-oss:5601"
+  username: ${MONITOR_USERNAME}
+  password: ${MONITOR_PASSWORD}
+
+# Allows you to add any config files in /usr/share/kibana/config/
+# such as kibana.yml
+kibanaConfig:
+  kibana.yml: |
+    telemetry.optIn: false
+    monitoring.kibana.collection.enabled: false
+    monitoring.ui.container.elasticsearch.enabled: true
+    xpack.security.encryptionKey: "VGhpc0lzS2liYW5hRW5jcnlwdGlvbktleUZvclNlY3VyaXR5"
+    xpack.encryptedSavedObjects.encryptionKey: "VGhpc0lzS2liYW5hRW5jcnlwdGlvbktleUZvclNlY3VyaXR5"
+    xpack.reporting.roles.enabled: false
+    xpack.reporting.encryptionKey: "VGhpc0lzS2liYW5hRW5jcnlwdGlvbktleUZvclNlY3VyaXR5"
+    xpack.reporting.kibanaServer.hostname: localhost
+    xpack.screenshotting.browser.chromium.disableSandbox: true
+    xpack.security.cookieName: "oss"
+
+    monitoring.ui.enabled: true
+
+    server.publicBaseUrl: https://{{ first .Values.hosts }}
+
+    server.ssl:
+      enabled: true
+      certificate: /usr/share/kibana/certs/tls.chain.crt
+      key: /usr/share/kibana/certs/tls.key
+      certificateAuthorities: /usr/share/kibana/certs/truststore-latest.pem
+    #xpack.security.encryptionKey: ${KIBANA_ENCRYPTION_KEY}
+    elasticsearch.ssl:
+      #truststore.path: /usr/share/kibana/config/certs/elastic-certificates.p12
+      #truststore.password: pEV50Qax6lSgjn2UbBaVw6UjyBJldbPm
+      certificateAuthorities: /usr/share/kibana/certs/truststore-latest.pem
+
+    logging:
+      appenders:
+        file-appender:
+          type: rolling-file
+          fileName: /usr/share/kibana/logs/kibana.log
+          policy:
+            type: size-limit 
+            size: 250mb
+          strategy:
+            type: numeric
+            pattern: '.%i'
+            max: 4
+          layout:
+            type: json
+      root:
+        level: error
+        appenders: [default, file-appender]
+    #verificationMode: certificate
+    ## Kibana Logging config ##
+    #logging.verbose: false
+    #logging.dest: /var/log/kibana/kibana.log
+    #logging.quiet: false
+    #logging.rotate:
+    #  enabled: true
+    #  everyBytes: 10485760
+    #  keepFiles: 5
+    #elasticsearch.requestHeadersWhitelist: [ es-security-runas-user, authorization ]
+    #csp.warnLegacyBrowsers: false
+
+fullnameOverride: "elk-kibana-oss"
