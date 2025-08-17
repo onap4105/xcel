@@ -101,3 +101,25 @@ kibanaConfig:
     #csp.warnLegacyBrowsers: false
 
 fullnameOverride: "elk-kibana-oss"
+==========================================
+====== solution   ========================
+==========================================
+
+extraEnvs:
+  - name: "KIBANA_ENCRYPTION_KEY"
+    valueFrom:
+      secretKeyRef:
+        name: kibana
+        key: encryptionkey
+
+# Allows you to add any config files in /usr/share/kibana/config/
+# such as kibana.yml
+kibanaConfig:
+  kibana.yml: |
+    telemetry.optIn: false
+    monitoring.kibana.collection.enabled: false
+    monitoring.ui.container.elasticsearch.enabled: true
+    xpack.security.encryptionKey: ${KIBANA_ENCRYPTION_KEY}
+    xpack.encryptedSavedObjects.encryptionKey: ${KIBANA_ENCRYPTION_KEY}
+    xpack.reporting.roles.enabled: false
+    xpack.reporting.encryptionKey: ${KIBANA_ENCRYPTION_KEY}
